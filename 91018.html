@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>牙周數據輸入表 - 術前/術後對比</title>
+    <title>91018專用輸入表</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 基礎表格樣式 */
@@ -204,6 +204,12 @@
       justify-content: space-between;
     }
   }
+  
+  /* 假設您使用 Tailwind CSS 或類似框架 */
+.plaque-1-highlight {
+    color: red !important;
+    /* 其他您希望的樣式 */
+}
     </style>
 </head>
 <body class="bg-gray-50 p-6 font-sans">
@@ -297,33 +303,51 @@
         <!-- 1. 基本資料 -->
         <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- 患者姓名Name -->
-                <div>
-                    <label for="patient-name" class="block text-sm font-medium text-gray-700 mb-1">患者姓名Name</label>
-                    <input type="text" id="patient-name" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="王小明 / Wang Xiao-Ming">
-                </div>
-                <!-- 身分證字號ID -->
-                <div>
-                    <label for="patient-id" class="block text-sm font-medium text-gray-700 mb-1">身分證字號ID</label>
-                    <input type="text" id="patient-id" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="A123456789">
-                </div>
-                <!-- 性別Sex -->
-                <div>
-                    <label for="patient-sex" class="block text-sm font-medium text-gray-700 mb-1">性別Sex</label>
-                    <!-- 使用 Select 欄位提供更好的 UX，但仍可手動輸入 -->
-                    <select id="patient-sex" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                        <option value="">請選擇</option>
-                        <option value="M">男 / Male</option>
-                        <option value="F">女 / Female</option>
-                        <option value="O">其他 / Other</option>
-                    </select>
-                </div>
-                <!-- 年齡Age -->
-                <div>
-                    <label for="patient-age" class="block text-sm font-medium text-gray-700 mb-1">年齡Age</label>
-                    <!-- type="text" + inputmode="numeric" 避免瀏覽器顯示上下箭頭 -->
-                    <input type="text" id="patient-age" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="年">
-                </div>
+<div>
+    <label for="patient-name" class="block text-sm font-medium text-gray-700 mb-1">患者姓名Name</label>
+    <input 
+        type="text" 
+        id="patient-name" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="name" 
+        placeholder="王小明 / Wang Xiao-Ming"
+    >
+</div>
+<div>
+    <label for="patient-id" class="block text-sm font-medium text-gray-700 mb-1">身分證字號ID</label>
+    <input 
+        type="text" 
+        id="patient-id" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="id" 
+        placeholder="A123456789"
+    >
+</div>
+<div>
+    <label for="patient-sex" class="block text-sm font-medium text-gray-700 mb-1">性別Sex</label>
+    <select 
+        id="patient-sex" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="sex"
+    >
+        <option value="">請選擇</option>
+        <option value="M">男 / Male</option>
+        <option value="F">女 / Female</option>
+        <option value="O">其他 / Other</option>
+    </select>
+</div>
+<div>
+    <label for="patient-age" class="block text-sm font-medium text-gray-700 mb-1">年齡Age</label>
+    <input 
+        type="text" 
+        id="patient-age" 
+        inputmode="numeric" 
+        pattern="[0-9]*" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="age"
+        placeholder="年"
+    >
+</div>
             </div>
         </section>
 
@@ -823,41 +847,59 @@
         <!-- 1. 基本資料 -->
         <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- 患者姓名Name -->
-                <div>
-                    <label for="patient-name" class="block text-sm font-medium text-gray-700 mb-1">患者姓名Name</label>
-                    <input type="text" id="patient-name" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="王小明">
-                </div>
-                <!-- 身分證字號ID -->
-                <div>
-                    <label for="patient-id" class="block text-sm font-medium text-gray-700 mb-1">身分證字號ID</label>
-                    <input type="text" id="patient-id" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="A123456789">
-                </div>
-                <!-- 性別Sex -->
-                <div>
-                    <label for="patient-sex" class="block text-sm font-medium text-gray-700 mb-1">性別Sex</label>
-                    <!-- 使用 Select 欄位提供更好的 UX，但仍可手動輸入 -->
-                    <select id="patient-sex" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                        <option value="">請選擇</option>
-                        <option value="M">男 / Male</option>
-                        <option value="F">女 / Female</option>
-                        <option value="O">其他 / Other</option>
-                    </select>
-                </div>
-                <!-- 年齡Age -->
-                <div>
-                    <label for="patient-age" class="block text-sm font-medium text-gray-700 mb-1">年齡Age</label>
-                    <!-- type="text" + inputmode="numeric" 避免瀏覽器顯示上下箭頭 -->
-                    <input type="text" id="patient-age" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="年">
-                </div>
+<div>
+    <label for="patient-name-2" class="block text-sm font-medium text-gray-700 mb-1">患者姓名Name</label>
+    <input 
+        type="text" 
+        id="patient-name-2" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="name" 
+        placeholder="王小明 / Wang Xiao-Ming"
+    >
+</div>
+<div>
+    <label for="patient-id-2" class="block text-sm font-medium text-gray-700 mb-1">身分證字號ID</label>
+    <input 
+        type="text" 
+        id="patient-id-2" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="id" 
+        placeholder="A123456789"
+    >
+</div>
+<div>
+    <label for="patient-sex-2" class="block text-sm font-medium text-gray-700 mb-1">性別Sex</label>
+    <select 
+        id="patient-sex-2" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="sex"
+    >
+        <option value="">請選擇</option>
+        <option value="M">男 / Male</option>
+        <option value="F">女 / Female</option>
+        <option value="O">其他 / Other</option>
+    </select>
+</div>
+<div>
+    <label for="patient-age-2" class="block text-sm font-medium text-gray-700 mb-1">年齡Age</label>
+    <input 
+        type="text" 
+        id="patient-age-2" 
+        inputmode="numeric" 
+        pattern="[0-9]*" 
+        class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sync-input" 
+        data-sync-group="age"
+        placeholder="年"
+    >
+</div>
 				<div>
-                    <label for="patient-name" class="block text-sm font-medium text-gray-700 mb-1">醫師姓名Doctor</label>
-                    <input type="text" id="patient-name" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="陳小華">
+                    <label for="dr-name-pd" class="block text-sm font-medium text-gray-700 mb-1">醫師姓名Doctor</label>
+                    <input type="text" id="dr-name-pd" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="陳小華">
                 </div>
 				<!-- 術前日期 -->
                         <div>
-                            <label for="pre-op-date" class="block text-sm font-medium text-gray-700 mb-1">日期Date</label>
-                            <input type="date" id="pre-op-date" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                            <label for="pd-date" class="block text-sm font-medium text-gray-700 mb-1">日期Date</label>
+                            <input type="date" id="pd-date" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
                         </div>
             </div>
         </section>
@@ -1360,19 +1402,339 @@
  
 </div>
 
+<div style="height: 20px;"></div>
+    <div class="container mx-auto p-4 space-y-8">
+        <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+				<div>
+                    <label for="dr-name-plaque" class="block text-sm font-medium text-gray-700 mb-1">醫師姓名Doctor</label>
+                    <input type="text" id="dr-name-plaque" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="陳小華">
+                </div>
+				<div>
+                            <label for="plaque-date" class="block text-sm font-medium text-gray-700 mb-1">日期Date</label>
+                            <input type="date" id="plaque-date" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                        </div>
+				            <div>
+                <label for="plaque-score class="block text-sm font-medium text-gray-700 mb-1">Plaque Score（牙菌斑指數）=</label>
+                
+                <div class="flex items-center space-x-2"> 
+                    
+                    <input type="text" id="plaqueScoreInput" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="80">
+                    
+                    <span class="text-lg font-semibold text-gray-700">%</span>
+                </div>
+            </div>
+            </div>
+        </section>
+    </div>
+    <div id="PlaqueData">
+		 <h1 class="mt-8 text-3xl font-extrabold text-blue-800 mb-6 border-b-4 border-blue-200 pb-2">91018牙菌斑記錄表</h1>
+        
+        <!-- 上顎數據 - Post-Op -->
+        <table id="plaqueUpperTable" class="pd-chart-table">
+            <thead></thead>
+
+            <tbody>
+                <tr data-group="Group1">
+                    <td>Buccal</td>
+                    <!-- Buccal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-3" data-pd-group="group1" value="" placeholder=""></td>
+
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-3" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-1" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-2" data-pd-group="group1" value="" placeholder=""></td>
+          <td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-3" data-pd-group="group1" value="" placeholder=""></td>
+                </tr>
+
+                <tr>
+                    <th>Tooth</th>
+                    <th colspan="3">18</th>
+                    <th colspan="3">17</th>
+                    <th colspan="3">16</th>
+                    <th colspan="3">15</th>
+                    <th colspan="3">14</th>
+                    <th colspan="3">13</th>
+                    <th colspan="3">12</th>
+                    <th colspan="3">11</th>
+                    <th colspan="3">21</th>
+                    <th colspan="3">22</th>
+                    <th colspan="3">23</th>
+                    <th colspan="3">24</th>
+                    <th colspan="3">25</th>
+                    <th colspan="3">26</th>
+                    <th colspan="3">27</th>
+                    <th colspan="3">28</th>
+                </tr>
+
+                <tr>
+                    <td>Palatal</td>
+                    <!-- Palatal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="18-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="17-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="16-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="15-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="14-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="13-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="12-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="11-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="21-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="22-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="23-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="24-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="25-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="26-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="27-4" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-6" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-5" data-pd-group="group2" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="28-4" data-pd-group="group2" value="" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="height: 10px;"></div>
+        
+        <table id="postOpSeparatorTable" style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
+            <tr>
+                <td colspan="49" style="height: 10px; background-color: #e5e7eb; border: none;"></td>
+            </tr>
+        </table>
+        
+        <div style="height: 10px;"></div>
+
+        <!-- 下顎數據 - Post-Op -->
+        <table id="PlaqueLowerTable" class="pd-chart-table">
+            <thead></thead>
+            <tbody>
+                <!-- 1. Lingual PD (D) -->
+                <tr>
+                    <td>Lingual</td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-4" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-6" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-5" data-pd-group="group3" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-4" data-pd-group="group3" value="" placeholder=""></td>
+                </tr>
+
+                <!-- 2. Tooth (E) -->
+                <tr>
+                    <th>Tooth</th>
+                    <th colspan="3">48</th>
+                    <th colspan="3">47</th>
+                    <th colspan="3">46</th>
+                    <th colspan="3">45</th>
+                    <th colspan="3">44</th>
+                    <th colspan="3">43</th>
+                    <th colspan="3">42</th>
+                    <th colspan="3">41</th>
+                    <th colspan="3">31</th>
+                    <th colspan="3">32</th>
+                    <th colspan="3">33</th>
+                    <th colspan="3">34</th>
+                    <th colspan="3">35</th>
+                    <th colspan="3">36</th>
+                    <th colspan="3">37</th>
+                    <th colspan="3">38</th>
+                </tr>
+
+                <!-- 3. Buccal PD (F) -->
+                <tr>
+                    <td>Buccal</td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="48-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="47-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="46-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="45-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="44-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="43-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="42-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="41-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="31-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="32-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="33-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="34-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="35-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="36-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="37-3" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-1" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-2" data-pd-group="group4" value="" placeholder=""></td>
+<td class="input-cell-container"><input type="text" class="input-cell post-op-pd plaque-91018-input" data-field="38-3" data-pd-group="group4" value="" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+    </div> <!-- End of postOpData -->
+
+
+</div> <!-- End of data-container -->
 
 <script>
 /**
- * 牙周數據 (PD) 輸入表格專用 JavaScript (重構版)
+ * 牙周數據 (PD) 輸入表格專用 JavaScript (最終完整版 V5 - Plaque 隨機填充修正)
  *
  * 包含：
- * 1. 輸入驗證 (1-10 整數) 與紅字高亮 (>= 5)。
+ * 1. PD 輸入驗證 (1-10 整數) 與紅字高亮 (>= 5)。
  * 2. 缺牙禁用 PD 輸入並計算現存總齒數。
- * 3. 病理顆數統計 (PD >= 5 的牙齒數量)。
+ * 3. 病理顆數統計 (PD >= 5 的牙齒數量，檢查術後數據)。
  * 4. 條件式複製術後數據 (基於術前數據隨機生成術後值)。
- * 5. 數據匯出/匯入 (JSON 格式，包含所有輸入、計算結果和缺牙狀態)。
- * 6. 自動跳格和方向鍵導航 (支援方向控制項 LTR/RTL 排序)。
- * 7. UI 輔助功能 (訊息提示、設定切換、一鍵清空)。
+ * 5. 【Plaque 最終邏輯】Plaque Grids <-> Plaque Score 雙向同步（隨機填充與手動計算）。
+ * - **重點修正：** Plaque Score 只有在「數值改變時」才執行隨機填充。
+ * - 匯入時，Plaque Grids (紅字 1) 數據優先，並計算出百分比。
+ * 6. 【功能】病人基本資料欄位連動 (sync-input)。
+ * 7. 數據匯出/匯入 (JSON 格式，包含所有輸入、計算結果和缺牙狀態)。
+ * 8. 自動跳格和方向鍵導航。
+ * 9. UI 輔助功能 (訊息提示、設定切換、一鍵清空)。
  */
 
 // ===============================================
@@ -1381,19 +1743,46 @@
 const MIN_RANGE = 1;         // PD 數據有效最小值
 const MAX_RANGE = 10;        // PD 數據有效最大值
 const INITIAL_TOTAL_TEETH = 32; // 預設總齒數
+const PLAQUE_INPUT_CLASS = '.plaque-91018-input';
+const PLAQUE_SCORE_ID = 'plaqueScoreInput';
+const SYNC_INPUT_CLASS = '.sync-input'; // 連動欄位 Class
 
-// 儲存所有 PD 輸入框元素的順序列表，用於導航
+// 儲存所有 PD 和 Plaque 輸入框元素的順序列表，用於導航
 let pdInputsOrder = [];
 
+// 【新增變數】記錄上次成功填充 Plaque Grids 時使用的百分比數值
+let lastPlaqueScore = null; 
+
+
+// 【連動欄位 ID 映射表】
+// 用於匯出/匯入時，處理連動欄位。key 為 JSON 欄位名，syncGroup 相同者互相同步。
+const PATIENT_INFO_FIELDS_MAP = [
+    { id: 'patient-name', key: '患者姓名Name', syncGroup: 'name', isSync: true }, 
+    { id: 'patient-name-2', key: '患者姓名Name_Sync', syncGroup: 'name', isSync: true },
+    { id: 'patient-id', key: '身分證字號ID', syncGroup: 'id', isSync: true },
+    { id: 'patient-id-2', key: '身分證字號ID_Sync', syncGroup: 'id', isSync: true },
+    { id: 'patient-sex', key: '性別Sex', syncGroup: 'sex', isSync: true },
+    { id: 'patient-sex-2', key: '性別Sex_Sync', syncGroup: 'sex', isSync: true },
+    { id: 'patient-age', key: '年齡Age', syncGroup: 'age', isSync: true },
+    { id: 'patient-age-2', key: '年齡Age_Sync', syncGroup: 'age', isSync: true },
+    
+    // 醫師欄位假設為非連動 (或只有第一組用於匯出/入鍵值)
+    { id: 'dr-name-pd', key: 'PD醫師姓名PDDoctor', isSync: false }, 
+    { id: 'dr-name-plaque', key: 'Plaque醫師姓名PlaqueDoctor', isSync: false },
+    // 日期欄位
+    { id: 'pre-op-date', key: '術前日期PreOpDate', isSync: false }, 
+    { id: 'pre-op-doctor', key: '術前醫師姓名PreOpDoctor', isSync: false },
+    { id: 'post-op-date', key: '術後日期PostOpDate', isSync: false }, 
+    { id: 'post-op-doctor', key: '術後醫師姓名PostOpDoctor', isSync: false },
+    { id: 'pd-date', key: 'PD日期PDDate', isSync: false }, 
+    { id: 'plaque-date', key: 'Plaque日期PlaqueDate', isSync: false }
+];
+
+
 // ===============================================
-// 2. UI 輔助功能 (訊息提示與設定切換)
+// 2. 輔助函數 (Utility Functions)
 // ===============================================
 
-/**
- * 顯示操作訊息的函數
- * @param {string} message - 要顯示的訊息內容
- * @param {'info'|'success'|'error'} type - 訊息類型
- */
 function showMessage(message, type = 'info') {
     const messageBox = document.getElementById('messageBox');
     if (!messageBox) return;
@@ -1411,15 +1800,18 @@ function showMessage(message, type = 'info') {
 
     messageBox.classList.remove('hidden');
 
-    // 3 秒後隱藏訊息
     setTimeout(() => {
         messageBox.classList.add('hidden');
     }, 3000);
 }
 
-/**
- * 切換設定區域的顯示與隱藏
- */
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 function toggleSettings() {
     const settingsArea = document.getElementById('settings-area');
     const toggleButton = document.getElementById('settings-toggle-btn');
@@ -1437,27 +1829,44 @@ function toggleSettings() {
     }
 }
 
-/**
- * 清空所有 PD 輸入欄位的數據。
- */
+function clearGroupInputs(inputClass) {
+    document.querySelectorAll(inputClass).forEach(input => {
+        input.value = '';
+        input.classList.remove('plaque-1-highlight');
+    });
+}
+
 function clearAllInputs() {
-    // 選擇所有具有 'pre-op-pd' 或 'post-op-pd' class 的輸入框
-    const allInputCells = document.querySelectorAll('.pre-op-pd, .post-op-pd, .info-input');
+    const allInputCells = document.querySelectorAll('.pre-op-pd, .post-op-pd, .info-input, .plaque-91018-input, #plaqueScoreInput, #post-op-improved-teeth, #post-op-improvement-rate, .sync-input, select');
     let clearedCount = 0;
 
-    // 清空所有 PD 輸入框和基本資訊輸入框
     allInputCells.forEach(input => {
         if (input.value !== '') {
             input.value = '';
             clearedCount++;
         }
-        // 同時移除可能存在的高亮樣式
-        input.classList.remove('highlight-input', 'value-ge-5');
+        input.classList.remove('highlight-input', 'value-ge-5', 'plaque-1-highlight');
     });
 
-    // 確保更新計數器
+    document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+        if (checkbox.checked) {
+            checkbox.checked = false;
+            handleMissingTooth(checkbox); // 重設狀態
+        }
+    });
+    
+    // 清除 Plaque 相關數據後，重設 lastPlaqueScore
+    lastPlaqueScore = null; 
+
+    clearGroupInputs(PLAQUE_INPUT_CLASS);
+    const plaqueScoreInput = document.getElementById(PLAQUE_SCORE_ID);
+    if (plaqueScoreInput) {
+        plaqueScoreInput.value = '';
+    }
+
     updatePathologyCount();
     updateTotalTeethCount();
+    initializeFocusOrder(); // 重新整理順序
 
     if (clearedCount > 0) {
         showMessage(`成功清除 ${clearedCount} 個輸入欄位中的數據。`, 'success');
@@ -1467,19 +1876,58 @@ function clearAllInputs() {
 }
 
 // ===============================================
-// 3. 核心數據處理：驗證與高亮
+// 3. 欄位連動功能 (Sync Inputs)
 // ===============================================
 
-/**
- * 檢查、清理輸入框數值，並設置紅字高亮 (PD >= 5)。
- * @param {HTMLElement} inputElement - 輸入框元素
- */
-function applyHighlight(inputElement) {
-    let value = inputElement.value;
-    // 1. 清理輸入：只允許數字
-    let cleanedValue = value.replace(/[^0-9]/g, '');
+function syncInputFields(currentInput) {
+    const group = currentInput.getAttribute('data-sync-group');
+    const value = currentInput.value; 
 
-    // 重置紅字標記
+    if (!group) return;
+
+    document.querySelectorAll(`${SYNC_INPUT_CLASS}[data-sync-group="${group}"]`).forEach(input => {
+        if (input !== currentInput) {
+            // 對於 select 元素，直接設定 value
+            if (input.tagName === 'SELECT') {
+                 // 確保選項存在
+                if (Array.from(input.options).some(opt => opt.value === value)) {
+                     input.value = value;
+                }
+            } else {
+                input.value = value;
+            }
+        }
+    });
+}
+
+function initializeSyncInputs() {
+    document.querySelectorAll(SYNC_INPUT_CLASS).forEach(input => {
+        // 使用 input 和 change 事件確保 text/select 欄位都能實時同步
+        input.addEventListener('input', (event) => {
+            syncInputFields(event.target);
+        });
+        input.addEventListener('change', (event) => {
+            syncInputFields(event.target);
+        });
+        
+        // 初始化時，以第一個找到的非空值來同步所有欄位
+        if (input.value.trim() !== '') {
+             syncInputFields(input);
+        }
+    });
+}
+
+// ===============================================
+// 4. 核心數據處理：PD 驗證與高亮
+// ===============================================
+
+function applyHighlight(inputElement) {
+    if (inputElement.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
+        return;
+    }
+
+    let value = inputElement.value;
+    let cleanedValue = value.replace(/[^0-9]/g, '');
     inputElement.classList.remove('value-ge-5');
 
     if (cleanedValue === '') {
@@ -1491,83 +1939,268 @@ function applyHighlight(inputElement) {
     const numericValue = parseInt(cleanedValue, 10);
     let finalValue = cleanedValue;
 
-    // 2. 嚴格範圍限制邏輯 (1-10 整數)
     if (numericValue < MIN_RANGE || isNaN(numericValue)) {
         finalValue = '';
     } else if (numericValue > MAX_RANGE) {
-        // 處理輸入超過 10 的情況，確保只保留第一個數字，除非是 10
         if (cleanedValue.length > 1 && cleanedValue.startsWith('1')) {
-             // 嘗試處理 '10', '1x'
-            if (cleanedValue === '10') {
-                 finalValue = '10';
-            } else {
-                finalValue = cleanedValue.substring(0, 1); // e.g. '12' -> '1'
-            }
+            finalValue = (cleanedValue === '10') ? '10' : cleanedValue.substring(0, 1);
         } else {
-            // 如果輸入 2位數但不是 '1x' (例如 '22'), 則只取第一位
             finalValue = cleanedValue.substring(0, 1);
         }
-
-        const correctedNumericValue = parseInt(finalValue, 10);
-        if (isNaN(correctedNumericValue) || correctedNumericValue < MIN_RANGE || correctedNumericValue > MAX_RANGE) {
-             finalValue = ''; // 如果修正後仍然無效
+        if (isNaN(parseInt(finalValue, 10)) || parseInt(finalValue, 10) < MIN_RANGE || parseInt(finalValue, 10) > MAX_RANGE) {
+            finalValue = '';
         }
     }
 
-    // 3. 設定修正後的值
     inputElement.value = finalValue;
-
-    // 4. 紅字高亮驗證
     const finalNumericValue = parseInt(finalValue, 10);
     if (!isNaN(finalNumericValue) && finalNumericValue >= 5) {
         inputElement.classList.add('value-ge-5');
     }
 
-    // 5. 每次輸入變更都更新病理顆數
     updatePathologyCount();
 }
 
-/**
- * 輔助函式：根據術前值生成條件式術後值 (整數)。
- * @param {number} preOpValue - 術前 PD 數值
- * @returns {string} - 生成的術後 PD 數值 (字串形式)
- */
 function generatePostOpValue(preOpValue) {
     let minValue, maxValue;
 
     if (preOpValue < 5) {
-        // 規則 1: 術前 < 5, 術後在 [1, 4] 之間隨機
         minValue = 1;
         maxValue = 4;
     } else {
-        // 規則 2: 術前 >= 5, 術後值必須至少比術前值少 2，且限制在 [3, 8] 範圍內。
-        // Math.min(8, preOpValue - 2) 確保不會超過 8，且至少下降 2
         minValue = 3;
         maxValue = Math.min(8, preOpValue - 2);
     }
 
     if (minValue > maxValue) {
-        // 應急處理，如果範圍無效 (理論上不會發生)
         return minValue.toString();
     }
 
     const randomValue = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
-
     return randomValue.toString();
 }
 
+function copyPreOpToPostOp() {
+    const preOpInputs = document.querySelectorAll('.pre-op-pd');
+    let copiedCount = 0;
+
+    preOpInputs.forEach(preOpInput => {
+        if (preOpInput.disabled || preOpInput.value.trim() === '') {
+            return;
+        }
+
+        const dataField = preOpInput.getAttribute('data-field');
+        const postOpInput = document.querySelector(`.post-op-pd[data-field="${dataField}"]`);
+
+        if (postOpInput && !postOpInput.disabled) {
+            const preOpValue = parseInt(preOpInput.value, 10);
+            const postOpValue = generatePostOpValue(preOpValue);
+
+            postOpInput.value = postOpValue;
+            applyHighlight(postOpInput);
+            copiedCount++;
+        }
+    });
+
+    if (copiedCount > 0) {
+        showMessage(`成功從術前 PD 複製並生成 ${copiedCount} 筆術後 PD 數據。`, 'success');
+    } else {
+        showMessage("沒有可複製或生成數據的術前 PD 欄位。", 'info');
+    }
+
+    updatePathologyCount();
+}
+
 // ===============================================
-// 4. 導航功能 (自動跳格與方向鍵)
+// 5. Plaque 91018 專屬功能 (雙向同步與隨機生成)
 // ===============================================
 
 /**
- * 根據方向控制項 (data-pd-group-control) 重新初始化 PD 欄位的焦點順序。
+ * 【核心函數：百分比 $\rightarrow$ 格子】根據 Plaque Score 隨機填入 '1'。
+ * @param {boolean} forceRecalculate - 是否強制根據百分比重新隨機填充 (用於匯入後清除匯入的格子數據)
  */
-function initializeFocusOrder() {
-    pdInputsOrder = []; // 重置主順序陣列
+function calculateAndFillPlaque(forceRecalculate = false) {
+    const plaqueInput = document.getElementById(PLAQUE_SCORE_ID);
+    if (!plaqueInput) return;
 
-    // 1. 取得所有 PD 輸入框並根據 data-pd-group 分組
-    const allInputs = Array.from(document.querySelectorAll('.pre-op-pd, .post-op-pd'));
+    let percentageStr = plaqueInput.value.replace(/[^0-9.]/g, '');
+    plaqueInput.value = percentageStr;  
+
+    const percentage = parseFloat(percentageStr);
+
+    // 檢查輸入是否合法
+    if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        clearGroupInputs(PLAQUE_INPUT_CLASS);
+        lastPlaqueScore = null; // 清除紀錄
+        if (percentageStr !== '') {
+            showMessage("Plaque Score 請輸入 0 到 100 之間的有效百分比數值。", 'error');
+        }
+        return;
+    }
+    
+    const roundedPercentage = Math.round(percentage); // 使用四捨五入後的整數進行比較
+
+    // 【修正邏輯】如果百分比值與上次填充的值相同，且不是強制重新計算，則跳過隨機填充。
+    if (!forceRecalculate && roundedPercentage === lastPlaqueScore) {
+         // 確保如果用戶只是在 Plaque Score 欄位點擊（blur/change），不會重新隨機生成
+         return; 
+    }
+
+    // 檢查是否有手動輸入的 Plaque Grid 數據
+    const hasPlaqueGridData = Array.from(document.querySelectorAll(PLAQUE_INPUT_CLASS))
+        .some(input => input.value.trim() === '1');
+
+    // 如果不是強制重新計算，且當前有 Plaque Grids 的紅字 1 數據，則不執行隨機填充，
+    // 因為這表示用戶正在手動操作格子，不應被百分比覆蓋。
+    if (!forceRecalculate && hasPlaqueGridData && document.activeElement !== plaqueInput) {
+        return;
+    }
+
+
+    // 1. 獲取並篩選有效的 Plaque 輸入格 (未禁用/未缺牙)
+    const allPlaqueInputs = Array.from(document.querySelectorAll(PLAQUE_INPUT_CLASS));
+    const missingTeeth = new Set();
+    document.querySelectorAll('.missing-tooth-toggle:checked').forEach(checkbox => {
+        missingTeeth.add(checkbox.dataset.tooth);
+    });
+
+    let availableInputs = allPlaqueInputs.filter(input => {
+        const toothNum = input.dataset.field.split('-')[0];
+        return !missingTeeth.has(toothNum) && !input.disabled;
+    });
+
+    const totalAvailableSites = availableInputs.length;
+    const targetCount = Math.round(totalAvailableSites * (roundedPercentage / 100));
+
+    // 2. 清除該組所有輸入格的舊數據和樣式
+    clearGroupInputs(PLAQUE_INPUT_CLASS);
+
+    if (totalAvailableSites === 0 || targetCount === 0) {
+        lastPlaqueScore = roundedPercentage; // 即使是 0/0% 也要記錄
+        return;
+    }
+
+    // 3. 隨機選取並寫入 '1'
+    shuffleArray(availableInputs);
+
+    for (let i = 0; i < targetCount; i++) {
+        const inputElement = availableInputs[i];
+        if (inputElement) {
+            inputElement.value = '1';
+            inputElement.classList.add('plaque-1-highlight');
+        }
+    }
+    
+    // 4. 成功執行隨機填充後，更新記錄的百分比
+    lastPlaqueScore = roundedPercentage;
+}
+
+
+/**
+ * 【核心函數：格子 $\rightarrow$ 百分比】計算並更新 Plaque Score 百分比。
+ */
+function updatePlaquePercentage() {
+    const plaqueScoreInput = document.getElementById(PLAQUE_SCORE_ID);
+    if (!plaqueScoreInput) return;
+
+    // 1. 獲取所有有效 Plaque 欄位
+    const allPlaqueInputs = Array.from(document.querySelectorAll(PLAQUE_INPUT_CLASS));
+    const missingTeeth = new Set();
+    document.querySelectorAll('.missing-tooth-toggle:checked').forEach(checkbox => {
+        missingTeeth.add(checkbox.dataset.tooth);
+    });
+
+    let availableInputs = allPlaqueInputs.filter(input => {
+        const toothNum = input.dataset.field.split('-')[0];
+        return !missingTeeth.has(toothNum) && !input.disabled;
+    });
+
+    const totalAvailableSites = availableInputs.length;
+    let positiveCount = 0;
+
+    // 2. 計算有 '1' 的欄位數量
+    availableInputs.forEach(input => {
+        if (input.value.trim() === '1') {
+            positiveCount++;
+        }
+    });
+
+    // 3. 計算百分比並寫入輸入框
+    let percentage = 0;
+    if (totalAvailableSites > 0) {
+        percentage = (positiveCount / totalAvailableSites) * 100;
+    }
+    
+    const finalPercentage = Math.round(percentage);
+
+    // 只有當手動操作 Plaque Grids 或缺牙切換時，我們才應更新 Plaque Score Input 的值
+    const activeElement = document.activeElement;
+    const isPlaqueGrid = activeElement && activeElement.classList.contains(PLAQUE_INPUT_CLASS.substring(1));
+    const isMissingToothChange = (activeElement && activeElement.classList.contains('missing-tooth-toggle'));
+
+    if (isPlaqueGrid || isMissingToothChange || activeElement !== plaqueScoreInput) {
+        plaqueScoreInput.value = finalPercentage;
+    }
+    
+    // 由於百分比是根據格子計算出來的，我們應該同步更新 lastPlaqueScore
+    // 這樣可以確保如果用戶手動操作格子後，再點擊 Plaque Score 欄位，也不會重新隨機生成。
+    lastPlaqueScore = finalPercentage; 
+
+    return finalPercentage; 
+}
+
+
+function handlePlaqueInput(inputElement) {
+    let value = inputElement.value.trim();
+
+    inputElement.classList.remove('plaque-1-highlight');
+    
+    if (value === '1') {
+        inputElement.value = '1';
+        inputElement.classList.add('plaque-1-highlight');
+        
+        focusNextEnabledInput(inputElement);
+        
+    } else if (value !== '') {
+        inputElement.value = '';
+    }
+    
+    // 手動輸入/刪除 '1' 後，同步更新百分比
+    updatePlaquePercentage();
+    
+    // 不需要在這裡呼叫 calculateAndFillPlaque，因為手動輸入優先
+}
+
+
+/**
+ * 【初始化函數】初始化 Plaque Score 隨機填充/手動輸入功能
+ */
+function initializePlaqueSimulator() {
+    const plaqueInput = document.getElementById(PLAQUE_SCORE_ID);
+    if (!plaqueInput) return;
+
+    // 1. 綁定 Plaque Score 輸入框的事件 (百分比 $\rightarrow$ 紅字 1)
+    // 只綁定 'input' 事件，確保只有數值改變時才觸發隨機填充
+    plaqueInput.addEventListener('input', () => {
+        calculateAndFillPlaque(true); // 透過百分比輸入必須強制重新計算
+    });
+    
+    // 移除原有的 change 綁定，避免失焦重複觸發
+    
+    // 2. 初始時執行一次，確保匯入數據或頁面重載後狀態正確
+    updatePlaquePercentage();
+    calculateAndFillPlaque();
+}
+
+
+// ===============================================
+// 6. 導航功能 (自動跳格與方向鍵)
+// ===============================================
+
+function initializeFocusOrder() {
+    pdInputsOrder = [];
+
+    const allInputs = Array.from(document.querySelectorAll('.pre-op-pd, .post-op-pd, .plaque-91018-input'));
     const groupedInputs = { group1: [], group2: [], group3: [], group4: [] };
 
     allInputs.forEach(input => {
@@ -1577,90 +2210,97 @@ function initializeFocusOrder() {
         }
     });
 
-    // 2. 依據控制項 (Select) 的設定來處理並重新排序每個群組
     for (let i = 1; i <= 4; i++) {
         const groupId = `group${i}`;
         const groupInputs = groupedInputs[groupId];
         const controlSelect = document.querySelector(`select[data-pd-group-control="${groupId}"]`);
-        const direction = controlSelect ? controlSelect.value : 'ltr'; // 預設為 LTR (由左到右)
+        const direction = controlSelect ? controlSelect.value : 'ltr';
 
         let orderedInputs = groupInputs;
 
-        // 如果設定為 'rtl' (由右到左)，則反轉該群組的元素順序
         if (direction === 'rtl') {
             orderedInputs = [...groupInputs].reverse();
         }
 
         pdInputsOrder.push(...orderedInputs);
     }
+    
+    // 確保只包含非 disabled 的元素
+    pdInputsOrder = pdInputsOrder.filter(input => !input.disabled);
 }
 
-/**
- * 找到當前輸入框後下一個未被禁用的輸入框並聚焦。
- * @param {HTMLElement} currentInput - 當前聚焦的輸入框元素
- */
 function focusNextEnabledInput(currentInput) {
     if (pdInputsOrder.length === 0) return;
 
     const currentIndex = pdInputsOrder.indexOf(currentInput);
     if (currentIndex === -1) {
-        // 如果不在順序列表中，則重新初始化順序
         initializeFocusOrder();
         return;
     }
 
-    // 從當前位置開始往後尋找第一個未被禁用的輸入框
     for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
         const nextInput = pdInputsOrder[i];
         if (!nextInput.disabled) {
             nextInput.focus();
-            nextInput.select(); // 選中內容方便直接輸入新值
+            nextInput.select();
             return;
         }
     }
 }
 
-/**
- * 處理鍵盤按下的事件，用於方向鍵 (左右) 和 Enter 鍵導航。
- * @param {Event} event - 鍵盤事件
- */
 function handleKeyNavigation(event) {
     const input = event.target;
-    // 確保只處理 PD 輸入框的事件
-    if (input.tagName !== 'INPUT' || (!input.classList.contains('pre-op-pd') && !input.classList.contains('post-op-pd'))) return;
+    if (input.tagName !== 'INPUT' || (!input.classList.contains('pre-op-pd') && !input.classList.contains('post-op-pd') && !input.classList.contains('plaque-91018-input'))) return;
 
-    if (pdInputsOrder.length === 0) {
+    if (pdInputsOrder.length === 0 || pdInputsOrder.indexOf(input) === -1) {
         initializeFocusOrder();
     }
-
+    
     const currentIndex = pdInputsOrder.indexOf(input);
     if (currentIndex === -1) return;
 
     let targetInput = null;
+    let nextIndex = -1;
 
     switch (event.keyCode) {
-        case 39: // Right Arrow (右箭頭)
-        case 13: // Enter (自動跳轉到下一個) - 處理 Enter 跳轉
-            event.preventDefault(); // 阻止預設的行為
-            // 尋找下一個 enabled 輸入框
-            for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
-                if (!pdInputsOrder[i].disabled) {
-                    targetInput = pdInputsOrder[i];
-                    break;
-                }
-            }
+        case 39: // Right Arrow
+        case 13: // Enter
+            event.preventDefault();
+            nextIndex = currentIndex + 1;
             break;
 
-        case 37: // Left Arrow (左箭頭) - 處理 Left Arrow 跳轉
-            event.preventDefault(); // 阻止預設的 Left Arrow (移動遊標)
-            // 尋找前一個 enabled 輸入框
-            for (let i = currentIndex - 1; i >= 0; i--) {
-                if (!pdInputsOrder[i].disabled) {
-                    targetInput = pdInputsOrder[i];
-                    break;
-                }
-            }
+        case 37: // Left Arrow
+            event.preventDefault();
+            nextIndex = currentIndex - 1;
             break;
+            
+        case 40: // Down Arrow
+             // 向下跳 6 格 (PD 表格的列數)
+            nextIndex = currentIndex + 6; 
+            break;
+            
+        case 38: // Up Arrow
+             // 向上跳 6 格
+            nextIndex = currentIndex - 6; 
+            break;
+            
+        default:
+            return;
+    }
+
+    while (nextIndex >= 0 && nextIndex < pdInputsOrder.length) {
+        if (!pdInputsOrder[nextIndex].disabled) {
+            targetInput = pdInputsOrder[nextIndex];
+            break;
+        }
+        // 如果是方向鍵，根據方向調整索引
+        if (event.keyCode === 39 || event.keyCode === 13 || event.keyCode === 40) {
+            nextIndex++;
+        } else if (event.keyCode === 37 || event.keyCode === 38) {
+            nextIndex--;
+        } else {
+             break;
+        }
     }
 
     if (targetInput) {
@@ -1670,14 +2310,11 @@ function handleKeyNavigation(event) {
 }
 
 // ===============================================
-// 5. 牙齒狀態與統計功能 (缺牙與病理顆數)
+// 7. 牙齒狀態與統計功能 (缺牙與病理顆數)
 // ===============================================
 
-/**
- * 更新現存總齒數 (32 - 缺牙數)。
- */
 function updateTotalTeethCount() {
-    const totalTeeth = INITIAL_TOTAL_TEETH; // 預設 32 顆牙
+    const totalTeeth = INITIAL_TOTAL_TEETH;
     const missingToggles = document.querySelectorAll('.missing-tooth-toggle');
 
     let missingCount = 0;
@@ -1691,21 +2328,16 @@ function updateTotalTeethCount() {
 
     const countElement = document.getElementById('pre-op-total-teeth');
     if (countElement) {
-        // 更新顯示文字：顯示現存總齒數
         countElement.textContent = `${presentCount} 顆`;
     }
 }
 
-/**
- * 處理缺牙切換鈕的狀態變化：禁用/啟用相關 PD 輸入框。
- * @param {HTMLInputElement} toggleElement - 缺牙切換鈕元素
- */
 function handleMissingTooth(toggleElement) {
     const toothNumber = toggleElement.getAttribute('data-tooth');
     const isMissing = toggleElement.checked;
 
     const toothInputs = document.querySelectorAll(
-        `.pre-op-pd[data-field^='${toothNumber}-'], .post-op-pd[data-field^='${toothNumber}-']`
+        `.pre-op-pd[data-field^='${toothNumber}-'], .post-op-pd[data-field^='${toothNumber}-'], ${PLAQUE_INPUT_CLASS}[data-field^='${toothNumber}-']`
     );
 
     toothInputs.forEach(input => {
@@ -1713,29 +2345,37 @@ function handleMissingTooth(toggleElement) {
             input.value = '';
             input.disabled = true;
             input.classList.add('bg-gray-200', 'cursor-not-allowed');
-            input.classList.remove('value-ge-5', 'highlight-input');
+            input.classList.remove('value-ge-5', 'plaque-1-highlight');
         } else {
             input.disabled = false;
             input.classList.remove('bg-gray-200', 'cursor-not-allowed');
-            // 重新應用高亮，確保復原後的狀態正確
-            applyHighlight(input);
+            // 重新應用高亮
+            if (!input.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
+                applyHighlight(input);
+            } else if (input.value === '1') {
+                 // 重新啟用時，若 Plaque 有值則恢復紅字
+                 input.classList.add('plaque-1-highlight');
+            }
         }
     });
 
-    // 狀態改變後，重新計算病理顆數和總齒數
     updatePathologyCount();
     updateTotalTeethCount();
+    
+    // 缺牙變化時，Plaque 總數和百分比會變，需要更新
+    updatePlaquePercentage(); 
+    // 不需要在此處呼叫 calculateAndFillPlaque，因為 updatePlaquePercentage 會更新 lastPlaqueScore，
+    // 避免因缺牙切換導致的 Plaque Score 改變而重新隨機填充。
+    
+    initializeFocusOrder(); // 重新計算導航順序
 }
 
-/**
- * 統計術前 PD >= 5 的牙齒數量 (病理顆數)。
- */
 function updatePathologyCount() {
     const teethWithPathology = new Set();
-    // 只檢查術前 (Pre-Op) PD 欄位
-    const preOpPdInputs = document.querySelectorAll('.post-op-pd');
+    // 統計術後 (post-op) PD >= 5 的牙齒數量
+    const postOpPdInputs = document.querySelectorAll('.post-op-pd');
 
-    preOpPdInputs.forEach(input => {
+    postOpPdInputs.forEach(input => {
         if (input.disabled) return;
 
         const value = parseInt(input.value.trim(), 10);
@@ -1743,7 +2383,6 @@ function updatePathologyCount() {
         if (!isNaN(value) && value >= 5) {
             const dataField = input.getAttribute('data-field');
             if (dataField) {
-                // 從 data-field (例如: 18-M) 中提取牙齒編號 (18)
                 const toothNumber = dataField.split('-')[0];
                 teethWithPathology.add(toothNumber);
             }
@@ -1758,112 +2397,50 @@ function updatePathologyCount() {
 }
 
 // ===============================================
-// 6. 條件式複製與貼上功能
+// 8. 數據匯出/匯入 (Export/Import)
 // ===============================================
 
-/**
- * 條件式地複製術前 PD 數據到術後 PD 欄位。
- * - 只填寫術後欄位為空的項目。
- * - 數值根據 preOpValue 進行隨機生成 (generatePostOpValue)。
- */
-function copyPreOpToPostOp() {
-    const preOpPdInputs = document.querySelectorAll('.pre-op-pd[data-field]');
-    const postOpPdInputs = document.querySelectorAll('.post-op-pd[data-field]');
-
-    const postOpPdMap = {};
-    postOpPdInputs.forEach(input => {
-        const dataField = input.getAttribute('data-field');
-        postOpPdMap[dataField] = input;
-    });
-
-    let generatedCount = 0;
-    let skippedCount = 0;
-
-    preOpPdInputs.forEach(preOpInput => {
-        const dataField = preOpInput.getAttribute('data-field');
-        const postOpInput = postOpPdMap[dataField];
-
-        // 檢查術前輸入框是否被禁用 (缺牙)
-        if (preOpInput.disabled) return;
-
-        if (postOpInput && !postOpInput.disabled) {
-            const preOpValueStr = preOpInput.value.trim();
-            const preOpValue = parseInt(preOpValueStr, 10);
-
-            // 檢查術前值是否有效
-            if (preOpValueStr === '' || isNaN(preOpValue) || preOpValue < MIN_RANGE || preOpValue > MAX_RANGE) {
-                return;
-            }
-
-            // 只有當術後欄位為空時才執行生成與填寫
-            if (postOpInput.value.trim() === '') {
-                const newPostOpValue = generatePostOpValue(preOpValue);
-                postOpInput.value = newPostOpValue;
-                postOpInput.classList.add('highlight-input'); // 應用高亮到術後輸入框
-                applyHighlight(postOpInput); // 重新驗證數值和紅字
-                generatedCount++;
-            } else {
-                skippedCount++;
-            }
-        }
-    });
-
-    if (generatedCount > 0 || skippedCount > 0) {
-        let message = `PD 數據生成與填寫完成。`;
-        if (generatedCount > 0) {
-            message += ` 成功生成並填寫 ${generatedCount} 個空白欄位。`;
-        }
-        if (skippedCount > 0) {
-            message += ` 跳過 ${skippedCount} 個已填寫或缺牙欄位。`;
-        }
-        showMessage(message, 'success');
-    } else {
-        showMessage("未找到有效的術前 PD 數據進行生成。", 'info');
-    }
-}
-
-// ===============================================
-// 7. 數據匯出/匯入 (Export/Import)
-// ===============================================
-
-/**
- * 收集所有需要匯出的數據：基本資料、術前/術後 PD 數據、結果總結、缺牙狀態。
- * @returns {Object} 包含所有結構化數據的物件。
- */
 function getAllDataForExport() {
     const data = {
         patientInfo: {},
         summary: {},
         preOpPD: {},
         postOpPD: {},
-        missingTeeth: {} // 儲存缺牙狀態
+        plaque91018: {}, 
+        missingTeeth: {}
     };
 
-    // --- 1. 收集基本資料與醫師資訊 (來自 ID 為 info-field 的輸入框) ---
-    const infoFields = [
-        { id: 'patient-name', key: '患者姓名Name' },
-        { id: 'patient-id', key: '身分證字號ID' },
-        { id: 'patient-sex', key: '性別Sex' },
-        { id: 'patient-age', key: '年齡Age' },
-        { id: 'pre-op-date', key: '術前日期PreOpDate' },
-        { id: 'pre-op-doctor', key: '術前醫師姓名PreOpDoctor' },
-        { id: 'post-op-date', key: '術後日期PostOpDate' },
-        { id: 'post-op-doctor', key: '術後醫師姓名PostOpDoctor' }
-    ];
+    // --- 1. 收集基本資料與醫師資訊 (處理同步和非同步欄位) ---
+    const exportedKeys = new Set();
+    PATIENT_INFO_FIELDS_MAP.forEach(field => {
+        if (exportedKeys.has(field.key)) return; 
 
-    infoFields.forEach(field => {
-        const element = document.getElementById(field.id);
-        if (element) {
-            data.patientInfo[field.key] = element.value ? element.value.trim() : '';
+        let value = '';
+        
+        if (field.isSync) {
+            document.querySelectorAll(`${SYNC_INPUT_CLASS}[data-sync-group="${field.syncGroup}"]`).forEach(input => {
+                if (input.value.trim() !== '') {
+                    value = input.value.trim();
+                }
+            });
+            if (field.id.endsWith('-2')) return; 
+            
+        } else {
+            const element = document.getElementById(field.id);
+            if (element) {
+                 value = element.value ? element.value.trim() : '';
+            }
         }
+        
+        data.patientInfo[field.key] = value;
+        exportedKeys.add(field.key);
     });
 
-    // --- 2. 收集結果總結數據 (輸入框與計算結果) ---
+    // --- 2. 收集結果總結數據 ---
     const summaryFields = [
-        // 輸入框 (Input fields)
         { id: 'post-op-improved-teeth', key: '治療後改善齒數ImprovedTeethCount', type: 'input' },
         { id: 'post-op-improvement-rate', key: '改善率ImprovementRate', type: 'input' },
-        // 顯示欄位 (Span/Calculated fields)
+        { id: PLAQUE_SCORE_ID, key: 'Plaque百分比PlaquePercent', type: 'input' },
         { id: 'pre-op-total-teeth', key: '治療前總齒數TotalTeethCount', type: 'span' },
         { id: 'pathology-tooth-count', key: '治療前囊袋5mm齒數PathologyTeethCount', type: 'span' },
     ];
@@ -1874,70 +2451,66 @@ function getAllDataForExport() {
             if (field.type === 'input') {
                 data.summary[field.key] = element.value ? element.value.trim() : '';
             } else if (field.type === 'span') {
-                // 嘗試將內容轉換為數字，並移除單位詞如 " 顆"
                 const textContent = element.textContent.trim();
                 data.summary[field.key] = textContent.replace(/[^0-9.]/g, '').trim();
             }
         }
     });
 
-    // --- 3. 收集 PD 數據 (Input fields with data-field) ---
-    const pdInputs = document.querySelectorAll('.pre-op-pd[data-field]:not([disabled]), .post-op-pd[data-field]:not([disabled])');
+    // --- 3. 收集 PD 和 Plaque 數據 ---
+    // 確保選擇器正確地包含了所有數據輸入框
+    const allDataInputs = document.querySelectorAll(`.pre-op-pd[data-field]:not([disabled]), .post-op-pd[data-field]:not([disabled]), ${PLAQUE_INPUT_CLASS}[data-field]:not([disabled])`);
 
-    pdInputs.forEach(input => {
+    allDataInputs.forEach(input => {
         const key = input.getAttribute('data-field');
-        if (input.value.trim() !== '') {
-            if (input.classList.contains('pre-op-pd')) {
-                data.preOpPD[key] = input.value.trim();
-            } else if (input.classList.contains('post-op-pd')) {
-                data.postOpPD[key] = input.value.trim();
+        const value = input.value.trim();
+        
+        if (value === '') return; // 值為空則跳過
+
+        // *** 修正後的優先檢查邏輯 ***
+        if (input.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
+            // Plaque 欄位: 優先檢查並只匯出值為 '1' 的位置
+            if (value === '1') {
+                data.plaque91018[key] = '1';
             }
+        } else if (input.classList.contains('pre-op-pd')) {
+            // Pre-Op PD 欄位
+            data.preOpPD[key] = value;
+        } else if (input.classList.contains('post-op-pd')) {
+            // Post-Op PD 欄位 (非 Plaque 的 Post-Op 欄位)
+            data.postOpPD[key] = value;
         }
     });
 
 
-    // --- 4. 收集缺牙狀態 (Missing Teeth Toggles) ---
+    // --- 4. 收集缺牙狀態 ---
     document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
         const toothNumber = checkbox.getAttribute('data-tooth');
-        // 儲存 true/false 狀態，true 表示缺牙
         data.missingTeeth[toothNumber] = checkbox.checked;
     });
 
     return data;
 }
 
-/**
- * 執行數據匯出 (下載 JSON 檔案)。
- */
 function exportData() {
     const dataToSave = getAllDataForExport();
 
-    // 檢查是否有任何數據存在
-    if (Object.keys(dataToSave.patientInfo).length === 0 &&
-        Object.keys(dataToSave.summary).length === 0 &&
-        Object.keys(dataToSave.preOpPD).length === 0 &&
-        Object.keys(dataToSave.postOpPD).length === 0 &&
-        Object.keys(dataToSave.missingTeeth).length === 0
-    ) {
+    if (Object.values(dataToSave).every(obj => Object.keys(obj).length === 0)) {
         showMessage("沒有任何可匯出的數據。", 'error');
         return;
     }
 
-    // --- 產生動態檔名 ---
     const patientName = dataToSave.patientInfo['患者姓名Name'] || 'Patient';
     const patientId = dataToSave.patientInfo['身分證字號ID'] || 'NoID';
 
-    // 移除檔名中不允許的或多餘的字元，僅保留中英數
     const safeName = patientName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '').substring(0, 20);
     const safeId = patientId.replace(/[^a-zA-Z0-9]/g, '');
 
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 
-    // 最終檔名格式: [Name]_[ID]_[Date]_Periodontal_Data.json
     const fileName = `${safeName}_${safeId}_${dateStr}_Periodontal_Data.json`;
 
-    // --- 下載處理 ---
     const jsonString = JSON.stringify(dataToSave, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1950,15 +2523,13 @@ function exportData() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    // 計算總匯出項目的數量 (僅用於訊息提示)
-    let totalCount = Object.keys(dataToSave.patientInfo).length + Object.keys(dataToSave.summary).length + Object.keys(dataToSave.preOpPD).length + Object.keys(dataToSave.postOpPD).length + Object.keys(dataToSave.missingTeeth).length;
+    let totalCount = Object.values(dataToSave).reduce((sum, obj) => sum + Object.keys(obj).length, 0);
 
     showMessage(`成功匯出 ${totalCount} 個數據到 ${fileName}`, 'success');
 }
 
 /**
  * 執行數據匯入。
- * @param {HTMLInputElement} fileInput - 檔案輸入元素
  */
 function importData(fileInput) {
     const file = fileInput.files[0];
@@ -1977,38 +2548,113 @@ function importData(fileInput) {
         try {
             const result = JSON.parse(event.target.result);
 
-            // --- 結構化載入數據 (兼容舊格式) ---
             const loadedData = {
                 patientInfo: result.patientInfo || {},
                 summary: result.summary || {},
-                preOpPD: result.preOpPD || result, // 舊格式直接將結果視為 preOpPD
+                preOpPD: result.preOpPD || result,
                 postOpPD: result.postOpPD || {},
+                plaque91018: result.plaque91018 || {},
                 missingTeeth: result.missingTeeth || {}
             };
 
             let loadedCount = 0;
 
-            // --- 1. 匯入基本資料 (Patient Info) ---
-            const infoFields = [
-                { id: 'patient-name', key: '患者姓名Name' }, { id: 'patient-id', key: '身分證字號ID' },
-                { id: 'patient-sex', key: '性別Sex' }, { id: 'patient-age', key: '年齡Age' },
-                { id: 'pre-op-date', key: '術前日期PreOpDate' }, { id: 'pre-op-doctor', key: '術前醫師姓名PreOpDoctor' },
-                { id: 'post-op-date', key: '術後日期PostOpDate' }, { id: 'post-op-doctor', key: '術後醫師姓名PostOpDoctor' }
-            ];
+            // --- 0. 清空所有舊數據和狀態，避免殘留
+            clearAllInputs(); 
 
-            infoFields.forEach(field => {
-                const value = loadedData.patientInfo[field.key];
-                const element = document.getElementById(field.id);
-                if (element && value !== undefined) {
-                    element.value = String(value);
-                    loadedCount++;
+            // --- 1. 匯入缺牙狀態 (必須先執行，影響後續欄位狀態) ---
+            document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+                 checkbox.checked = false;
+            });
+            for (const toothNumber in loadedData.missingTeeth) {
+                if (loadedData.missingTeeth.hasOwnProperty(toothNumber)) {
+                    const isMissing = loadedData.missingTeeth[toothNumber];
+                    const checkbox = document.querySelector(`.missing-tooth-toggle[data-tooth="${toothNumber}"]`);
+
+                    if (checkbox && typeof isMissing === 'boolean') {
+                        checkbox.checked = isMissing;
+                        handleMissingTooth(checkbox); // 立即觸發禁用/啟用
+                        loadedCount++;
+                    }
+                }
+            }
+            
+            // --- 2. 匯入 PD 和 Plaque Grids 數據 (確保欄位有值) ---
+             ['preOpPD', 'postOpPD', 'plaque91018'].forEach(type => {
+                let selector, className;
+                if (type === 'preOpPD') {
+                    selector = '.pre-op-pd[data-field]'; className = 'pre-op-pd';
+                } else if (type === 'postOpPD') {
+                    // 對於 Plaque 和 PostOpPD 混用的欄位，先處理 Plaque，再處理 PostOpPD (如果它們的值不是 '1')
+                    selector = '.post-op-pd[data-field]'; className = 'post-op-pd'; 
+                } else {
+                    selector = PLAQUE_INPUT_CLASS + '[data-field]'; className = PLAQUE_INPUT_CLASS.substring(1);
+                }
+
+                // 清空目標欄位 (雖然 clearAllInputs 已經執行，但再次清空目標確保)
+                document.querySelectorAll(selector).forEach(input => {
+                    input.value = '';
+                    input.classList.remove('value-ge-5', 'plaque-1-highlight');
+                });
+
+                const dataMap = loadedData[type];
+                for (const dataField in dataMap) {
+                    if (dataMap.hasOwnProperty(dataField)) {
+                        const value = dataMap[dataField];
+                        const input = document.querySelector(`.${className}[data-field="${dataField}"]`);
+                        const isPlaqueInput = input && input.classList.contains(PLAQUE_INPUT_CLASS.substring(1));
+
+                        // 只有在欄位未被禁用時才匯入
+                        if (input && !input.disabled) { 
+                            // Plaque 匯入邏輯：只針對 plaque91018 匯入 '1'
+                            if (type === 'plaque91018' && isPlaqueInput && value === '1') {
+                                // Plaque 欄位匯入
+                                input.value = '1';
+                                input.classList.add('plaque-1-highlight'); 
+                                loadedCount++;
+                            } else if (type !== 'plaque91018') {
+                                // PD 欄位匯入 (忽略那些同時也是 Plaque 欄位的 PD 值)
+                                if (!isPlaqueInput || type === 'preOpPD') { 
+                                     input.value = String(value);
+                                     applyHighlight(input);
+                                     loadedCount++;
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
-            // --- 2. 匯入結果總結輸入欄位 (Summary Inputs) ---
+            // --- 3. 匯入基本資料 (Patient Info) (處理連動) ---
+            const infoFieldKeys = new Set();
+            PATIENT_INFO_FIELDS_MAP.forEach(field => {
+                if (infoFieldKeys.has(field.key)) return; 
+
+                const value = loadedData.patientInfo[field.key];
+                
+                if (value !== undefined && value !== null) {
+                    if (field.isSync) {
+                        document.querySelectorAll(`${SYNC_INPUT_CLASS}[data-sync-group="${field.syncGroup}"]`).forEach(input => {
+                            input.value = String(value);
+                            loadedCount++;
+                        });
+                        infoFieldKeys.add(field.key); 
+                    } else {
+                        const element = document.getElementById(field.id);
+                        if (element) {
+                             element.value = String(value);
+                             loadedCount++;
+                        }
+                    }
+                }
+            });
+
+
+            // --- 4. 匯入結果總結輸入欄位 (Summary Inputs) ---
             const summaryInputFields = [
                 { id: 'post-op-improved-teeth', key: '治療後改善齒數ImprovedTeethCount' },
                 { id: 'post-op-improvement-rate', key: '改善率ImprovementRate' },
+                { id: PLAQUE_SCORE_ID, key: 'Plaque百分比PlaquePercent' },
             ];
 
             summaryInputFields.forEach(field => {
@@ -2020,67 +2666,31 @@ function importData(fileInput) {
                 }
             });
 
-            // --- 3. 匯入缺牙狀態 (Missing Teeth Toggles) ---
-            // 3.1. 先重置所有缺牙核取方塊為未勾選
-            document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-
-            // 3.2. 根據匯入數據設定狀態
-            for (const toothNumber in loadedData.missingTeeth) {
-                if (loadedData.missingTeeth.hasOwnProperty(toothNumber)) {
-                    const isMissing = loadedData.missingTeeth[toothNumber];
-                    const checkbox = document.querySelector(`.missing-tooth-toggle[data-tooth="${toothNumber}"]`);
-
-                    if (checkbox && typeof isMissing === 'boolean') {
-                        checkbox.checked = isMissing;
-                        // 觸發 change event，以更新 UI 狀態 (禁用/啟用 PD 輸入框)
-                        checkbox.dispatchEvent(new Event('change'));
-                        loadedCount++;
-                    }
-                }
+            // --- 5. Plaque 邏輯最終調整 (Plaque Grid 優先原則) ---
+            
+            // 檢查是否有匯入 Plaque Grid 數據 (即匯出文件中有 Plaque Grid 記錄)
+            const hasGridData = Object.keys(loadedData.plaque91018).length > 0;
+            
+            if (hasGridData) {
+                 // a. 根據匯入的格子數據 (Step 2)，計算出準確的百分比並填入 Plaque Score 欄位
+                 const finalPercentage = updatePlaquePercentage(); 
+                 // b. updatePlaquePercentage 內部已更新 lastPlaqueScore
+            } else {
+                 // 如果沒有匯入 Plaque Grid 數據，則使用匯入的 Plaque Score (summary 中的值)
+                 // 強制執行一次隨機填充 (如果 summary 中有值的話)
+                 calculateAndFillPlaque(true);
             }
-
-
-            // --- 4. 匯入術前/術後 PD 數據 (Pre-Op & Post-Op PD) ---
-            ['preOpPD', 'postOpPD'].forEach(type => {
-                const isPreOp = type === 'preOpPD';
-                const selector = isPreOp ? '.pre-op-pd[data-field]' : '.post-op-pd[data-field]';
-
-                // 清空目標欄位 (雖然 handleMissingTooth 會處理禁用，但先清空確保數據一致性)
-                document.querySelectorAll(selector).forEach(input => {
-                    if (!input.disabled) {
-                        input.value = '';
-                        applyHighlight(input);
-                    }
-                });
-
-                const dataMap = loadedData[type];
-                for (const dataField in dataMap) {
-                    if (dataMap.hasOwnProperty(dataField)) {
-                        const value = dataMap[dataField];
-                        const input = document.querySelector(`.${isPreOp ? 'pre-op-pd' : 'post-op-pd'}[data-field="${dataField}"]`);
-
-                        if (input && !input.disabled) {
-                            input.value = String(value);
-                            applyHighlight(input); // 設置值後應用高亮與驗證
-                            loadedCount++;
-                        }
-                    }
-                }
-            });
-
+            
+            
             showMessage(`成功匯入 ${loadedCount} 個數據到各欄位。`, 'success');
-            // 確保計算結果更新
             updatePathologyCount();
             updateTotalTeethCount();
-            initializeFocusOrder(); // 重新初始化導航順序，以防萬一
+            initializeFocusOrder();
 
         } catch (error) {
             console.error("JSON 解析或數據匯入失敗:", error);
             showMessage("解析 JSON 檔案失敗或數據結構錯誤。", 'error');
         } finally {
-            // 清空 file input 的值，以便下次可以選擇同一個檔案
             fileInput.value = '';
         }
     };
@@ -2092,85 +2702,93 @@ function importData(fileInput) {
     reader.readAsText(file);
 }
 
-
 // ===============================================
-// 8. 初始化和事件監聽
+// 9. 初始化和事件監聽
 // ===============================================
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. 設定切換按鈕的初始化
+    // 1. UI 初始化
     const toggleButton = document.getElementById('settings-toggle-btn');
     const settingsArea = document.getElementById('settings-area');
     if (toggleButton && settingsArea) {
-        // 預設狀態: 開啟
-        settingsArea.classList.remove('hidden');
-        toggleButton.setAttribute('aria-expanded', 'true');
-        toggleButton.textContent = '設定 (點擊隱藏)';
+        settingsArea.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.textContent = '設定 (點擊開啟)';
         toggleButton.onclick = toggleSettings;
     }
+    
+    // 2. 啟動連動輸入框
+    initializeSyncInputs();
 
-    // 2. 呼叫 initializeFocusOrder 來建立初始 PD 欄位順序列表
+    // 3. 呼叫 initializeFocusOrder 來建立初始 PD 和 Plaque 欄位順序列表
     initializeFocusOrder();
 
-    // 3. PD 輸入欄位事件綁定
-    const allPdInputs = document.querySelectorAll('.pre-op-pd, .post-op-pd');
+    // 4. PD 和 Plaque 輸入欄位事件綁定
+    const allDataInputs = document.querySelectorAll('.pre-op-pd, .post-op-pd, .plaque-91018-input');
 
-    allPdInputs.forEach(input => {
-        // 初始高亮 (針對已有的值)
+    allDataInputs.forEach(input => {
         applyHighlight(input);
 
-        // a. Input 事件: 數值檢查、高亮、病理計數 和 自動跳格
         input.addEventListener('input', (event) => {
-            applyHighlight(event.target);
+            const target = event.target;
+            
+            if (target.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
+                handlePlaqueInput(target);
+            } else {
+                applyHighlight(target);
 
-            // --- 自動跳格邏輯 ---
-            const value = event.target.value;
-            const numericValue = parseInt(value, 10);
-
-            if (!isNaN(numericValue)) {
-                // 條件 1: 輸入 2-9 的單個數字
+                const value = target.value;
+                const numericValue = parseInt(value, 10);
+                
                 const isSingleDigitJump = (value.length === 1 && numericValue >= 2 && numericValue <= 9);
-
-                // 條件 2: 輸入 '10' (兩位數)
                 const isTenJump = (value === '10');
 
                 if (isSingleDigitJump || isTenJump) {
-                    focusNextEnabledInput(event.target);
+                    focusNextEnabledInput(target);
                 }
             }
-            // ---------------------
         });
 
-        // b. Blur 事件: 再次應用高亮確保離開時數值正確
         input.addEventListener('blur', (event) => {
-            applyHighlight(event.target);
+            const target = event.target;
+            if (!target.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
+                applyHighlight(target);
+            } else {
+                 // Plaque 格子失焦時，更新百分比
+                 updatePlaquePercentage();
+            }
         });
 
-        // c. Keydown 事件: 處理方向鍵 (左右) 和 Enter 鍵的導航
         input.addEventListener('keydown', handleKeyNavigation);
     });
+    
+    // 5. 綁定導航控制選單事件
+    document.querySelectorAll('select[data-pd-group-control]').forEach(select => {
+        select.addEventListener('change', initializeFocusOrder);
+    });
+    
+    // 6. 初始化 Plaque Simulator
+    initializePlaqueSimulator();
 
-    // 4. 缺牙切換鈕事件
+    // 7. 缺牙切換鈕事件
     document.querySelectorAll('.missing-tooth-toggle').forEach(toggle => {
         toggle.addEventListener('change', (event) => {
             handleMissingTooth(event.target);
-            // 當缺牙狀態改變時，需要重新計算導航順序，因為某些欄位被啟用/禁用
-            initializeFocusOrder();
         });
-        // 初始檢查缺牙狀態 (會觸發 handleMissingTooth 內的總齒數計算)
+        // 初始化時，調用一次，確保狀態正確
         handleMissingTooth(toggle);
     });
 
-    // 5. 初始計算病理顆數 和 總齒數
+    // 8. 初始計算病理顆數 和 總齒數
     updatePathologyCount();
     updateTotalTeethCount();
-
-    // 6. 綁定功能按鈕事件
+    
+    // 9. 綁定功能按鈕事件
     document.getElementById('copyDataBtn')?.addEventListener('click', copyPreOpToPostOp);
     document.getElementById('clearDataBtn')?.addEventListener('click', clearAllInputs);
 
-    // 7. 暴露給全域環境，以供 HTML 中直接呼叫
+    // 10. 暴露給全域環境
     window.initializeFocusOrder = initializeFocusOrder;
     window.copyPreOpToPostOp = copyPreOpToPostOp;
     window.handleMissingTooth = handleMissingTooth;
@@ -2178,9 +2796,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.importData = importData;
     window.clearAllInputs = clearAllInputs;
     window.toggleSettings = toggleSettings;
+    window.updatePlaquePercentage = updatePlaquePercentage;
 });
-
-
 </script>
 
 
