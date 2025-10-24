@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plaque Score（牙菌斑指數）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 基礎表格樣式 */
+        table, th, td { 
+            border: 1px solid #c0c0c0; /* 使用淺灰色邊框 */
+            border-collapse: collapse; 
+            padding: 4px; /* 稍微減少 padding */
+            text-align: center;
+            font-size: 14px; /* 調整字體大小 */
+            color: #333;
+        }
+        
+        h2 {
+            font-size: 1.25rem; /* Tailwind text-xl */
+            font-weight: 600; /* Tailwind font-semibold */
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937; /* 深灰色標題 */
+        }
+
+        .data-container { 
+            margin: 20px; 
+            overflow-x: auto; /* 確保在小螢幕上可以橫向滾動 */
+        }
+
+        /* 輸入框容器的樣式：移除 td 預設 padding */
+        .input-cell-container {
+            padding: 0; 
+            height: 30px; /* 給予一個固定的高度，確保行高一致 */
+            line-height: 30px;
+        }
+        
+        /* ============== 表格佈局關鍵樣式 (確保上下對齊) ============== */
+
+        /* 讓**所有表格**都使用固定佈局，確保欄位寬度由 CSS 控制 */
+        .pd-chart-table {
+            table-layout: fixed; 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+
+        /* 1. 設定**所有表格**的第一欄（標籤欄，如 Mobility, Buccal PD, Lingual PD）的固定寬度 */
+        .pd-chart-table thead tr th:first-child,
+        .pd-chart-table tbody tr td:first-child,
+        .pd-chart-table tbody tr th:first-child { 
+            width: 120px; /* 給予標籤欄一個固定的寬度 */
+            min-width: 120px;
+            font-weight: bold;
+            background-color: #f7f9fc;
+        }
+        
+        /* 2. 設定**所有數據輸入欄位單元格**的寬度 */
+        .pd-chart-table .input-cell-container,
+        .pd-chart-table thead tr[data-group="Manual48"] td,
+        .pd-chart-table tbody tr td:not(:first-child) {
+            width: calc((100% - 120px) / 48); 
+            padding: 0;
+            vertical-align: middle;
+        }
+
+        /* 處理跨欄標頭 (Mobility/Tooth/Furcation Labels) */
+        .pd-chart-table thead tr:first-child td[colspan="3"],
+        .pd-chart-table tbody tr:has(> td[colspan="3"]) td[colspan="3"],
+        .pd-chart-table tbody tr th[colspan="3"] {
+            width: calc((100% - 120px) / 16); /* 16 顆牙，每顆佔 3 欄 */
+            padding: 0;
+        }
+        
+        /* ============== 輸入框樣式 ============== */
+        .input-cell { 
+            width: 100%; 
+            height: 100%; 
+            box-sizing: border-box; 
+            border: none; 
+            text-align: center; 
+            padding: 5px 2px; /* 垂直 5px，水平 2px */
+            background-color: transparent; 
+            transition: background-color 0.2s;
+            line-height: normal;
+        }
+
+        .input-cell:focus {
+            outline: 2px solid #4CAF50; 
+            background-color: #f9f9f9; 
+        }
+
+        /* 數值大於或等於 5 時的樣式 (PD值高亮) */
+        .value-ge-5 { 
+            color: red !important; 
+            font-weight: bold;
+        }
+        
+  /* === 共用按鈕樣式 === */
+  .btn-like {
+      display: inline-flex;              /* 讓 label 也像按鈕 */
+      align-items: center;               /* 垂直置中 */
+      justify-content: center;
+      margin: 10px 5px;                  /* 四顆之間留一點距離 */
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s;
+      text-align: center;
+      line-height: 1;                    /* 防止 label 出現多餘空白行 */
+      min-height: 40px;                  /* 確保高度一致 */
+      white-space: nowrap;               /* 避免自動換行 */
+  }
+
+  /* === 各顏色變化（你可以自由調整） === */
+  .btn-green  { background-color: #4CAF50; }  /* 原 copyButton 綠色 */
+  .btn-blue   { background-color: #2196F3; }  /* 藍色 */
+  .btn-yellow { background-color: #FF9800; }  /* 黃橙色 */
+  .btn-red    { background-color: #F44336; }  /* 紅色 */
+
+  /* Hover 效果 */
+  .btn-green:hover  { background-color: #45a049; }
+  .btn-blue:hover   { background-color: #1e88e5; }
+  .btn-yellow:hover { background-color: #fb8c00; }
+  .btn-red:hover    { background-color: #e53935; }
+
+  /* Active 效果 */
+  .btn-like:active { transform: scale(0.98); }
+
+  /* 隱藏 input[type=file] */
+  input[type="file"].hidden {
+      display: none;
+  }
+
+  /* 容器樣式 */
+  .direction-group {
+    display: flex;
+    flex-wrap: wrap; /* 小螢幕時自動換行 */
+    justify-content: center;
+    gap: 12px;
+  }
+
+  /* 每一組 label + select */
+  .direction-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 15px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.1s;
+  }
+
+  .direction-group label:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  /* 下拉選單美化 */
+  .direction-group select {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .direction-group select:focus {
+    border-color: #4CAF50;
+    outline: none;
+  }
+
+  /* RWD：手機上改成直排 */
+  @media (max-width: 640px) {
+    .direction-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .direction-group label {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  
+  .plaque-positive {
+    color: red !important; /* 強制顏色為紅色 */
+    font-weight: bold; /* 讓數字更明顯 */
+    text-align: center; /* 讓數字居中 */
+}
+    </style>
+</head>
+<body class="bg-gray-50 p-6 font-sans">
+<!-- ============================================= -->
+<!-- 1. 設定切換按鈕 -->
+<!-- ============================================= -->
+<div class="flex justify-center my-4">
+    <button
+        id="settings-toggle-btn"
+        type="button"
+        onclick="toggleSettings()"
+        aria-expanded="true"
+        aria-controls="settings-area"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+    >
+        設定
+    </button>
+</div>
+
+
+<!-- ============================================= -->
+<!-- 2. 設定內容收合區域 (用 ID: settings-area 包住您想收合的兩段內容) -->
+<!-- 注意：初始狀態下，這裡不帶 hidden 類別，因為 JS 已經設定為開啟 -->
+<!-- ============================================= -->
+<div id="settings-area">
+<!-- ✅ HTML 按鈕群組區塊 -->
+<div class="flex justify-center space-x-4">
+  
+  <!-- 2. 匯出術前 PD 數據 -->
+  <button onclick="exportData()" class="btn-like btn-blue">
+      匯出數據 (JSON)
+  </button>
+
+  <!-- 3. 匯入術前 PD 數據 (用 label 當按鈕) -->
+  <label for="importFile" class="btn-like btn-yellow">
+      匯入數據 (.json)
+  </label>
+  <input type="file" id="importFile" accept=".json" onchange="importData(this)" class="hidden">
+
+  <!-- 4. 清除所有數據 -->
+  <button id="clearDataBtn" onclick="clearData()" class="btn-like btn-red">
+      清除所有數據
+  </button>
+
+</div>
+
+<div class="direction-group">
+  <label>上顎 buccal 方向：
+    <select data-pd-group-control="group1" onchange="initializeFocusOrder()">
+      <option value="ltr">由左到右 (L→R)</option>
+      <option value="rtl">由右到左 (R→L)</option>
+    </select>
+  </label>
+
+  <label>上顎 palatal 方向：
+    <select data-pd-group-control="group2" onchange="initializeFocusOrder()">
+      <option value="ltr">由左到右 (L→R)</option>
+      <option value="rtl">由右到左 (R→L)</option>
+    </select>
+  </label>
+
+  <label>下顎 lingual 方向：
+    <select data-pd-group-control="group3" onchange="initializeFocusOrder()">
+      <option value="ltr">由左到右 (L→R)</option>
+      <option value="rtl">由右到左 (R→L)</option>
+    </select>
+  </label>
+
+  <label>下顎 buccal 方向：
+    <select data-pd-group-control="group4" onchange="initializeFocusOrder()">
+      <option value="ltr">由左到右 (L→R)</option>
+      <option value="rtl">由右到左 (R→L)</option>
+    </select>
+  </label>
+</div>
+
+</div>
+<!-- 載入 Tailwind CSS (確保您的主文件中已有此行) -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+<div class="container mx-auto p-4 space-y-8">
+    <h1 class="text-3xl font-extrabold text-blue-800 mb-6 border-b-4 border-blue-200 pb-2">基本資料</h1>
+
+    <!-- 欄位容器 (使用 Grid 實現響應式 2 欄或 4 欄佈局) -->
+    <div class="space-y-8">
+        <!-- 1. 基本資料 -->
+        <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 患者姓名Name -->
+                <div>
+                    <label for="patient-name" class="block text-sm font-medium text-gray-700 mb-1">患者姓名Name</label>
+                    <input type="text" id="patient-name" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="王小明">
+                </div>
+                <!-- 身分證字號ID -->
+                <div>
+                    <label for="patient-id" class="block text-sm font-medium text-gray-700 mb-1">身分證字號ID</label>
+                    <input type="text" id="patient-id" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="A123456789">
+                </div>
+                <!-- 性別Sex -->
+                <div>
+                    <label for="patient-sex" class="block text-sm font-medium text-gray-700 mb-1">性別Sex</label>
+                    <!-- 使用 Select 欄位提供更好的 UX，但仍可手動輸入 -->
+                    <select id="patient-sex" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                        <option value="">請選擇</option>
+                        <option value="M">男 / Male</option>
+                        <option value="F">女 / Female</option>
+                        <option value="O">其他 / Other</option>
+                    </select>
+                </div>
+                <!-- 年齡Age -->
+                <div>
+                    <label for="patient-age" class="block text-sm font-medium text-gray-700 mb-1">年齡Age</label>
+                    <!-- type="text" + inputmode="numeric" 避免瀏覽器顯示上下箭頭 -->
+                    <input type="text" id="patient-age" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="年">
+                </div>
+				</div>
+        </section>
+
+    </div>
+</div>
+
+    <!---------------------------------
+    //  第一組數據
+    ---------------------------------->
+<div class="container mx-auto p-4 space-y-8">
+    <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div>
+                <label for="dr-name1" class="block text-sm font-medium text-gray-700 mb-1">醫師姓名Doctor</label>
+                <input type="text" id="dr-name1" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="陳小華">
+            </div>
+            
+            <div>
+                <label for="pre-op-date" class="block text-sm font-medium text-gray-700 mb-1">日期Date</label>
+                <input type="date" id="pre-op-date" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+            </div>
+            
+            <div>
+                <label for="plaque-score" class="block text-sm font-medium text-gray-700 mb-1">Plaque Score（牙菌斑指數）=</label>
+                
+                <div class="flex items-center space-x-2"> 
+                    
+                    <input type="text" id="plaqueScoreInput" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="80">
+                    
+                    <span class="text-lg font-semibold text-gray-700">%</span>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+</div>
+
+
+    <div id="preOpData">
+	<div style="height: 20px;"></div>
+        <!-- 上顎數據 - Pre-Op -->
+        <table id="preOpUpperTable" class="pd-chart-table">
+            <thead></thead>
+            <tbody>
+<tr data-group="Group1">
+    <td>Buccal</td>
+    <!-- Buccal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-3" data-pd-group="group1" value="" placeholder=""></td>
+
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-3" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-1" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-2" data-pd-group="group1" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-3" data-pd-group="group1" value="" placeholder=""></td>
+</tr>
+
+
+<tr>
+    <th>Tooth</th>
+    <th colspan="3">18<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="18" title="設為缺牙"></div></th>
+    <th colspan="3">17<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="17" title="設為缺牙"></div></th>
+    <th colspan="3">16<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="16" title="設為缺牙"></div></th>
+    <th colspan="3">15<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="15" title="設為缺牙"></div></th>
+    <th colspan="3">14<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="14" title="設為缺牙"></div></th>
+    <th colspan="3">13<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="13" title="設為缺牙"></div></th>
+    <th colspan="3">12<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="12" title="設為缺牙"></div></th>
+    <th colspan="3">11<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="11" title="設為缺牙"></div></th>
+    <th colspan="3">21<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="21" title="設為缺牙"></div></th>
+    <th colspan="3">22<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="22" title="設為缺牙"></div></th>
+    <th colspan="3">23<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="23" title="設為缺牙"></div></th>
+    <th colspan="3">24<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="24" title="設為缺牙"></div></th>
+    <th colspan="3">25<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="25" title="設為缺牙"></div></th>
+    <th colspan="3">26<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="26" title="設為缺牙"></div></th>
+    <th colspan="3">27<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="27" title="設為缺牙"></div></th>
+    <th colspan="3">28<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="28" title="設為缺牙"></div></th>
+</tr>
+
+<tr>
+	<td>Palatal</td>
+	<!-- Palatal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="18-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="17-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="16-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="15-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="14-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="13-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="12-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="11-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="21-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="22-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="23-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="24-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="25-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="26-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="27-4" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-6" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-5" data-pd-group="group2" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="28-4" data-pd-group="group2" value="" placeholder=""></td>
+	</tr>
+            </tbody>
+        </table>
+        
+        <div style="height: 10px;"></div>
+        
+        <table id="preOpSeparatorTable" style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
+            <tr>
+                <td colspan="49" style="height: 10px; background-color: #e5e7eb; border: none;"></td>
+            </tr>
+        </table>
+        
+        <div style="height: 10px;"></div>
+
+        <!-- 下顎數據 - Pre-Op -->
+        <table id="preOpLowerTable" class="pd-chart-table">
+            <thead></thead>
+            <tbody>
+                <!-- 1. Lingual PD (D) -->
+<tr>
+    <td>Lingual</td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-4" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-6" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-5" data-pd-group="group3" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-4" data-pd-group="group3" value="" placeholder=""></td>
+</tr>
+
+                <!-- 2. Tooth (E) -->
+<!-- 牙位行 (下顎右側到左側) -->
+<tr>
+    <th>Tooth</th>
+    <th colspan="3">48<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="48" title="設為缺牙"></div></th>
+    <th colspan="3">47<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="47" title="設為缺牙"></div></th>
+    <th colspan="3">46<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="46" title="設為缺牙"></div></th>
+    <th colspan="3">45<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="45" title="設為缺牙"></div></th>
+    <th colspan="3">44<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="44" title="設為缺牙"></div></th>
+    <th colspan="3">43<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="43" title="設為缺牙"></div></th>
+    <th colspan="3">42<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="42" title="設為缺牙"></div></th>
+    <th colspan="3">41<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="41" title="設為缺牙"></div></th>
+    <th colspan="3">31<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="31" title="設為缺牙"></div></th>
+    <th colspan="3">32<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="32" title="設為缺牙"></div></th>
+    <th colspan="3">33<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="33" title="設為缺牙"></div></th>
+    <th colspan="3">34<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="34" title="設為缺牙"></div></th>
+    <th colspan="3">35<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="35" title="設為缺牙"></div></th>
+    <th colspan="3">36<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="36" title="設為缺牙"></div></th>
+    <th colspan="3">37<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="37" title="設為缺牙"></div></th>
+    <th colspan="3">38<div class="mt-1"><input type="checkbox" class="missing-tooth-toggle" data-tooth="38" title="設為缺牙"></div></th>
+</tr>
+
+                <!-- 3. Buccal PD (F) -->
+<tr>
+    <td>Buccal</td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="48-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="47-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="46-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="45-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="44-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="43-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="42-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="41-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="31-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="32-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="33-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="34-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="35-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="36-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="37-3" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-1" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-2" data-pd-group="group4" value="" placeholder=""></td>
+    <td class="input-cell-container"><input type="text" class="input-cell pre-op-pd" data-field="38-3" data-pd-group="group4" value="" placeholder=""></td>
+</tr>
+            </tbody>
+        </table>
+    </div> <!-- End of preOpData -->
+	
+<div style="height: 50px;"></div>	
+    <!---------------------------------
+    //  第二組數據：術後資料 (Post-Op)
+    ---------------------------------->
+    
+
+    <!-- 欄位容器 (使用 Grid 實現響應式 2 欄或 4 欄佈局) -->
+    <div class="container mx-auto p-4 space-y-8">
+        <section class="p-4 bg-white rounded-lg shadow-md border-l-4 border-blue-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+				<div>
+                    <label for="dr-name2" class="block text-sm font-medium text-gray-700 mb-1">醫師姓名Doctor</label>
+                    <input type="text" id="dr-name2" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="陳小華">
+                </div>
+				<div>
+                            <label for="post-op-date" class="block text-sm font-medium text-gray-700 mb-1">日期Date</label>
+                            <input type="date" id="post-op-date" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                        </div>
+				            <div>
+                <label for="plaque-score-2 class="block text-sm font-medium text-gray-700 mb-1">Plaque Score（牙菌斑指數）=</label>
+                
+                <div class="flex items-center space-x-2"> 
+                    
+                    <input type="text" id="plaqueScoreInput2" inputmode="numeric" pattern="[0-9]*" class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="80">
+                    
+                    <span class="text-lg font-semibold text-gray-700">%</span>
+                </div>
+            </div>
+            </div>
+        </section>
+    </div>
+
+
+<div style="height: 20px;"></div>
+    <div id="postOpData">
+		
+        
+        <!-- 上顎數據 - Post-Op -->
+        <table id="postOpUpperTable" class="pd-chart-table">
+            <thead></thead>
+
+            <tbody>
+                <tr data-group="Group1">
+                    <td>Buccal</td>
+                    <!-- Buccal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-3" data-pd-group="group1" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-3" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-1" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-2" data-pd-group="group1" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-3" data-pd-group="group1" value="" placeholder=""></td>
+                </tr>
+
+                <tr>
+                    <th>Tooth</th>
+                    <th colspan="3">18</th>
+                    <th colspan="3">17</th>
+                    <th colspan="3">16</th>
+                    <th colspan="3">15</th>
+                    <th colspan="3">14</th>
+                    <th colspan="3">13</th>
+                    <th colspan="3">12</th>
+                    <th colspan="3">11</th>
+                    <th colspan="3">21</th>
+                    <th colspan="3">22</th>
+                    <th colspan="3">23</th>
+                    <th colspan="3">24</th>
+                    <th colspan="3">25</th>
+                    <th colspan="3">26</th>
+                    <th colspan="3">27</th>
+                    <th colspan="3">28</th>
+                </tr>
+
+                <tr>
+                    <td>Palatal</td>
+                    <!-- Palatal PD inputs (18 to 28) - 3 columns per tooth, total 48 input columns -->
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="18-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="17-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="16-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="15-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="14-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="13-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="12-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="11-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="21-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="22-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="23-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="24-4" data-pd-group="group2" value="" placeholder=""></td>
+
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="25-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="26-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="27-4" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-6" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-5" data-pd-group="group2" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="28-4" data-pd-group="group2" value="" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="height: 10px;"></div>
+        
+        <table id="postOpSeparatorTable" style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
+            <tr>
+                <td colspan="49" style="height: 10px; background-color: #e5e7eb; border: none;"></td>
+            </tr>
+        </table>
+        
+        <div style="height: 10px;"></div>
+
+        <!-- 下顎數據 - Post-Op -->
+        <table id="postOpLowerTable" class="pd-chart-table">
+            <thead></thead>
+            <tbody>
+                <!-- 1. Lingual PD (D) -->
+                <tr>
+                    <td>Lingual</td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-4" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-6" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-5" data-pd-group="group3" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-4" data-pd-group="group3" value="" placeholder=""></td>
+                </tr>
+
+                <!-- 2. Tooth (E) -->
+                <tr>
+                    <th>Tooth</th>
+                    <th colspan="3">48</th>
+                    <th colspan="3">47</th>
+                    <th colspan="3">46</th>
+                    <th colspan="3">45</th>
+                    <th colspan="3">44</th>
+                    <th colspan="3">43</th>
+                    <th colspan="3">42</th>
+                    <th colspan="3">41</th>
+                    <th colspan="3">31</th>
+                    <th colspan="3">32</th>
+                    <th colspan="3">33</th>
+                    <th colspan="3">34</th>
+                    <th colspan="3">35</th>
+                    <th colspan="3">36</th>
+                    <th colspan="3">37</th>
+                    <th colspan="3">38</th>
+                </tr>
+
+                <!-- 3. Buccal PD (F) -->
+                <tr>
+                    <td>Buccal</td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="48-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="47-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="46-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="45-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="44-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="43-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="42-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="41-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="31-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="32-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="33-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="34-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="35-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="36-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="37-3" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-1" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-2" data-pd-group="group4" value="" placeholder=""></td>
+                    <td class="input-cell-container"><input type="text" class="input-cell post-op-pd" data-field="38-3" data-pd-group="group4" value="" placeholder=""></td>
+                </tr>
+            </tbody>
+        </table>
+    </div> <!-- End of postOpData -->
+
+
+</div> <!-- End of data-container -->
+
+<div style="height: 50px;"></div>	
+
+<script>
+/**
+ * 牙菌斑指數 (Plaque Score) 輸入表格專用 JavaScript (重構版)
+ *
+ * 核心功能：
+ * 1. 雙向聯動：Plague Score 百分比 <-> 表格隨機/手動輸入 '1'
+ * 2. Plaque Score 數據獨立運作 (第一組: .pre-op-pd, 第二組: .post-op-pd)
+ * 3. 缺牙狀態 (Missing Tooth) 聯動禁用兩組表格輸入框。
+ * 4. 數據匯出/匯入 (JSON 格式，包含所有輸入和缺牙狀態)。
+ * 5. 導航優化 (輸入 '1' 自動跳格)。
+ *
+ * 移除功能：
+ * - 移除 PD >= 5 紅字高亮與統計。
+ * - 移除條件式複製術後數據。
+ */
+
+// ===============================================
+// 1. 常數與全域變數
+// ===============================================
+const INITIAL_TOTAL_TEETH = 32; // 預設總齒數 (用於匯出資料結構)
+let pdInputsOrder = []; // 儲存所有 PD 輸入框元素的順序列表，用於導航
+
+// ===============================================
+// 2. 數據處理核心 (Plaque Score 雙向聯動)
+// ===============================================
+
+/**
+ * 輔助函數：打亂陣列 (Fisher-Yates Shuffle)
+ */
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+/**
+ * 根據表格中 '1' 的數量，反向計算並更新 Plaque Score 百分比輸入框。
+ * @param {string} inputClass - 該組表格輸入框的 Class (e.g., '.pre-op-pd')
+ * @param {string} plaqueInputID - 該組 Plaque Score 輸入框的 ID (e.g., 'plaqueScoreInput')
+ */
+function calculatePercentage(inputClass, plaqueInputID) {
+    const plaqueInput = document.getElementById(plaqueInputID);
+    if (!plaqueInput) return;
+
+    const allPDInputs = Array.from(document.querySelectorAll(inputClass));
+
+    // 1. 找出所有缺牙的牙位
+    const missingTeeth = new Set();
+    document.querySelectorAll('.missing-tooth-toggle:checked').forEach(checkbox => {
+        missingTeeth.add(checkbox.dataset.tooth);
+    });
+
+    // 2. 篩選出有效位點 (非缺牙)
+    let availableInputs = allPDInputs.filter(input => {
+        const toothNum = input.dataset.field.split('-')[0];
+        return !missingTeeth.has(toothNum);
+    });
+
+    const totalAvailableSites = availableInputs.length;
+    let countOfOnes = 0;
+
+    // 3. 計算有效位點中 '1' 的數量
+    availableInputs.forEach(input => {
+        // 驗證只計算 '1'
+        if (input.value.trim() === '1') {
+            countOfOnes++;
+        }
+    });
+
+    // 4. 計算並更新百分比
+    let newPercentage = 0;
+    if (totalAvailableSites > 0) {
+        newPercentage = Math.round((countOfOnes / totalAvailableSites) * 100);
+    }
+
+    // 僅當計算出的百分比與當前輸入框值不同時才更新，避免循環觸發
+    if (parseFloat(plaqueInput.value) !== newPercentage) {
+         plaqueInput.value = newPercentage.toString();
+    }
+}
+
+/**
+ * 核心函數：根據 Plaque Score 隨機填入 '1'。
+ * @param {string} inputClass - 該組表格輸入框的 Class (e.g., '.pre-op-pd')
+ * @param {string} plaqueInputID - 該組 Plaque Score 輸入框的 ID (e.g., 'plaqueScoreInput')
+ */
+function calculateAndFillPlaque(inputClass, plaqueInputID) {
+    const plaqueInput = document.getElementById(plaqueInputID);
+    if (!plaqueInput) return;
+
+    const percentageStr = plaqueInput.value.trim();
+    const percentage = parseFloat(percentageStr);
+    
+    // 檢查輸入是否有效
+    if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        // 輸入無效或清空時，應清除該組所有 '1'
+        clearGroupInputs(inputClass); 
+        return;
+    }
+
+    // 1. 獲取該組所有輸入格
+    const allPDInputs = Array.from(document.querySelectorAll(inputClass));
+
+    // 2. 找出所有缺牙的牙位
+    const missingTeeth = new Set();
+    document.querySelectorAll('.missing-tooth-toggle:checked').forEach(checkbox => {
+        missingTeeth.add(checkbox.dataset.tooth);
+    });
+
+    // 3. 篩選出需要參與計算的有效輸入格
+    let availableInputs = allPDInputs.filter(input => {
+        const toothNum = input.dataset.field.split('-')[0];
+        return !missingTeeth.has(toothNum);
+    });
+
+    const totalAvailableSites = availableInputs.length;
+    const targetCount = Math.round(totalAvailableSites * (percentage / 100));
+
+    // 4. 清除該組所有輸入格的舊數據和樣式
+    clearGroupInputs(inputClass);
+
+    if (targetCount === 0 || totalAvailableSites === 0) {
+        return;
+    }
+
+    // 5. 隨機選取並寫入 '1'
+    shuffleArray(availableInputs);
+
+    for (let i = 0; i < targetCount; i++) {
+        const inputElement = availableInputs[i];
+        inputElement.value = '1';
+        // 使用 Tailwind 的樣式來顯示紅字 '1' (假設是 'text-red-600')
+        inputElement.classList.add('plaque-positive'); 
+    }
+}
+
+/**
+ * 輔助函數：清除特定組的 PD 輸入框的值和紅色樣式
+ * @param {string} inputClass - 該組表格輸入框的 Class (e.g., '.pre-op-pd')
+ */
+function clearGroupInputs(inputClass) {
+    document.querySelectorAll(inputClass).forEach(input => {
+        input.value = '';
+        input.classList.remove('plaque-positive');
+    });
+}
+
+/**
+ * 初始化 Plaque Score 隨機填充/手動輸入功能
+ * @param {string} plaqueInputID - Plaque Score 輸入框的 ID
+ * @param {string} inputClass - 該組表格輸入框的 Class
+ */
+function initializePlaqueSimulator(plaqueInputID, inputClass) {
+    const plaqueInput = document.getElementById(plaqueInputID);
+    if (!plaqueInput) return;
+
+    // 綁定 Plaque Score 輸入框的事件 (百分比 -> 紅字 1)
+    plaqueInput.addEventListener('input', () => {
+        calculateAndFillPlaque(inputClass, plaqueInputID);
+    });
+
+    // 缺牙切換鈕的 'change' 事件將在 DOMContentLoaded 時統一綁定，並在 handleMissingTooth 裡處理。
+    // 但是，我們需要確保缺牙切換時，Score 也能被重新計算/填充。
+    document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+             // 重新計算百分比並填充 '1'
+             calculateAndFillPlaque(inputClass, plaqueInputID);
+        });
+    });
+}
+
+
+// ===============================================
+// 3. 輸入驗證與自動跳格
+// ===============================================
+
+/**
+ * 檢查、清理輸入框數值 (只能是 '1' 或 '')。
+ * @param {HTMLElement} inputElement - 輸入框元素
+ * @param {string} plaqueInputID - 所屬 Plaque Score 輸入框的 ID
+ * @param {string} inputClass - 所屬表格輸入框的 Class
+ */
+function applyOneOnlyValidation(inputElement, plaqueInputID, inputClass) {
+    let value = inputElement.value.trim();
+
+    // 1. 驗證輸入：只允許 '1' 或清空
+    if (value === '1') {
+        inputElement.value = '1';
+        // 樣式：紅字 '1'
+        inputElement.classList.add('plaque-positive');
+    } else {
+        // 任何其他輸入 (包括 2, 0, 10, a, 等) 都視為清空
+        inputElement.value = '';
+        inputElement.classList.remove('plaque-positive');
+    }
+
+    // 2. 更新百分比：手動修改後，需要反向計算百分比
+    calculatePercentage(inputClass, plaqueInputID);
+}
+
+/**
+ * 找到當前輸入框後下一個未被禁用的輸入框並聚焦。
+ * @param {HTMLElement} currentInput - 當前聚焦的輸入框元素
+ */
+function focusNextEnabledInput(currentInput) {
+    if (pdInputsOrder.length === 0) return;
+
+    const currentIndex = pdInputsOrder.indexOf(currentInput);
+    if (currentIndex === -1) {
+        initializeFocusOrder(); // 如果找不到，重新建立順序
+        return;
+    }
+
+    // 從當前位置開始往後尋找第一個未被禁用的輸入框
+    for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
+        const nextInput = pdInputsOrder[i];
+        if (!nextInput.disabled) {
+            nextInput.focus();
+            nextInput.select(); // 選中內容方便直接輸入新值
+            return;
+        }
+    }
+}
+
+
+// ===============================================
+// 4. 導航功能 (方向鍵)
+// ===============================================
+
+/**
+ * 根據方向控制項 (data-pd-group-control) 重新初始化 PD 欄位的焦點順序。
+ * 注意：此處需包含兩組 class 才能正確導航。
+ */
+function initializeFocusOrder() {
+    pdInputsOrder = []; // 重置主順序陣列
+
+    // 1. 取得所有 PD 輸入框並根據 data-pd-group 分組
+    const allInputs = Array.from(document.querySelectorAll('.pre-op-pd, .post-op-pd'));
+    // 假設群組 ID 是 group1 到 group8 (如果表格很大)
+    const groupedInputs = {};
+    for (let i = 1; i <= 8; i++) {
+        groupedInputs[`group${i}`] = [];
+    }
+
+    allInputs.forEach(input => {
+        const group = input.getAttribute('data-pd-group');
+        if (group && groupedInputs.hasOwnProperty(group)) {
+            groupedInputs[group].push(input);
+        }
+    });
+
+    // 2. 依據控制項 (Select) 的設定來處理並重新排序每個群組
+    for (let i = 1; i <= 8; i++) { // 這裡假設您有 group1 到 group8 的控制項
+        const groupId = `group${i}`;
+        const groupInputs = groupedInputs[groupId];
+        // 尋找對應的控制項 Select 元素
+        const controlSelect = document.querySelector(`select[data-pd-group-control="${groupId}"]`);
+        // 預設為 LTR (由左到右)
+        const direction = controlSelect ? controlSelect.value : 'ltr'; 
+
+        let orderedInputs = groupInputs;
+
+        // 如果設定為 'rtl' (由右到左)，則反轉該群組的元素順序
+        if (direction === 'rtl') {
+            orderedInputs = [...groupInputs].reverse();
+        }
+
+        pdInputsOrder.push(...orderedInputs);
+    }
+}
+
+/**
+ * 處理鍵盤按下的事件，用於方向鍵 (左右) 和 Tab/Enter 鍵導航。
+ * @param {Event} event - 鍵盤事件
+ */
+function handleKeyNavigation(event) {
+    const input = event.target;
+    // 確保只處理 PD 輸入框的事件
+    if (input.tagName !== 'INPUT' || (!input.classList.contains('pre-op-pd') && !input.classList.contains('post-op-pd'))) return;
+
+    if (pdInputsOrder.length === 0) {
+        initializeFocusOrder();
+    }
+
+    const currentIndex = pdInputsOrder.indexOf(input);
+    if (currentIndex === -1) return;
+
+    let targetInput = null;
+
+    switch (event.keyCode) {
+        case 39: // Right Arrow (右箭頭)
+        case 13: // Enter (自動跳轉到下一個)
+            event.preventDefault(); // 阻止預設的行為
+            // 尋找下一個 enabled 輸入框
+            for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
+                if (!pdInputsOrder[i].disabled) {
+                    targetInput = pdInputsOrder[i];
+                    break;
+                }
+            }
+            break;
+
+        case 37: // Left Arrow (左箭頭)
+            event.preventDefault(); // 阻止預設的 Left Arrow (移動遊標)
+            // 尋找前一個 enabled 輸入框
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (!pdInputsOrder[i].disabled) {
+                    targetInput = pdInputsOrder[i];
+                    break;
+                }
+            }
+            break;
+    }
+
+    if (targetInput) {
+        targetInput.focus();
+        targetInput.select();
+    }
+}
+
+
+// ===============================================
+// 5. 牙齒狀態與統計功能 (缺牙)
+// ===============================================
+
+/**
+ * 更新現存總齒數 (32 - 缺牙數) - 僅為資訊顯示。
+ */
+function updateTotalTeethCount() {
+    const totalTeeth = INITIAL_TOTAL_TEETH; 
+    const missingToggles = document.querySelectorAll('.missing-tooth-toggle');
+
+    let missingCount = 0;
+    missingToggles.forEach(toggle => {
+        if (toggle.checked) {
+            missingCount++;
+        }
+    });
+
+    const presentCount = totalTeeth - missingCount;
+
+    const countElement = document.getElementById('total-teeth-count');
+    if (countElement) {
+         // 統一使用一個 ID 來顯示總齒數
+        countElement.textContent = `${presentCount} 顆`;
+    }
+}
+
+/**
+ * 處理缺牙切換鈕的狀態變化：禁用/啟用相關 PD 輸入框。
+ * @param {HTMLInputElement} toggleElement - 缺牙切換鈕元素
+ */
+function handleMissingTooth(toggleElement) {
+    const toothNumber = toggleElement.getAttribute('data-tooth');
+    const isMissing = toggleElement.checked;
+
+    // 禁用/啟用兩組表格中對應牙位的輸入框
+    const toothInputs = document.querySelectorAll(
+        `.pre-op-pd[data-field^='${toothNumber}-'], .post-op-pd[data-field^='${toothNumber}-']`
+    );
+
+    toothInputs.forEach(input => {
+        if (isMissing) {
+            input.value = ''; // 清空值
+            input.disabled = true;
+            input.classList.add('bg-gray-200', 'cursor-not-allowed');
+            input.classList.remove('plaque-positive');
+        } else {
+            input.disabled = false;
+            input.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            // 重新檢查值，確保復原後的樣式正確 (儘管此時值應該是空的)
+            applyOneOnlyValidation(input, 'plaqueScoreInput', '.pre-op-pd'); 
+            applyOneOnlyValidation(input, 'plaqueScoreInput2', '.post-op-pd'); 
+        }
+    });
+
+    // 狀態改變後，需要重新計算總齒數
+    updateTotalTeethCount();
+
+    // 狀態改變後，通知 Plaque Score 重新計算/填充 (已在 initializePlaqueSimulator 中綁定)
+}
+
+// ===============================================
+// 6. 數據匯出/匯入 (Export/Import)
+// ===============================================
+
+/**
+ * 清空所有輸入欄位的數據（包含兩組 Plaque Score 和兩組表格）。
+ */
+function clearAllInputs() {
+    // 選擇所有需要清空的輸入框 (表格, Plaque Score, 資訊欄位)
+    // 已更新選擇器，包含新的 ID：patient-sex, patient-age, dr-name1, dr-name2, post-op-date
+    const allInputCells = document.querySelectorAll(
+        '.pre-op-pd, .post-op-pd, .info-input, #plaqueScoreInput, #plaqueScoreInput2, ' +
+        '#patient-sex, #patient-age, #dr-name1, #dr-name2, #post-op-date'
+    );
+    let clearedCount = 0;
+
+    allInputCells.forEach(input => {
+        // 對 <select> (例如性別) 進行清空
+        if (input.tagName === 'SELECT') {
+             // 確保選擇第一個選項 (通常是空白或預設值)
+            input.selectedIndex = 0; 
+        } else if (input.type !== 'checkbox' && input.value !== '') {
+            input.value = '';
+            clearedCount++;
+        }
+        
+        // 移除所有可能的樣式
+        input.classList.remove('plaque-positive', 'value-ge-5');
+    });
+
+    // 清除缺牙狀態
+    document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+        if (checkbox.checked) {
+             checkbox.checked = false;
+             // 觸發事件來重新啟用被禁用的輸入框
+             handleMissingTooth(checkbox); 
+        }
+    });
+    
+    // 確保計算結果更新
+    updateTotalTeethCount();
+    
+    // 重新初始化 Plaque Score 欄位
+    document.getElementById('plaqueScoreInput')?.dispatchEvent(new Event('input'));
+    document.getElementById('plaqueScoreInput2')?.dispatchEvent(new Event('input'));
+
+    if (clearedCount > 0) {
+        showMessage(`成功清除 ${clearedCount} 個輸入欄位中的數據，並重置缺牙狀態。`, 'success');
+    } else {
+        showMessage("所有輸入欄位都已經是空的。", 'info');
+    }
+}
+
+
+/**
+ * 收集所有需要匯出的數據：基本資料、兩組 PD 數據、缺牙狀態、Plaque Score。
+ * **已更新：使用提供的 patient-sex, patient-age, dr-name1, dr-name2, post-op-date ID。**
+ * @returns {Object} 包含所有結構化數據的物件。
+ */
+function getAllDataForExport() {
+    const data = {
+        patientInfo: {},
+        summary: {}, // 僅保留 Plaque Score
+        preOpPD: {},
+        postOpPD: {},
+        missingTeeth: {}
+    };
+
+    // --- 1. 收集基本資料與醫師資訊 ---
+    const infoFields = [
+        // 基礎資訊
+        { id: 'patient-name', key: '患者姓名Name' },
+        { id: 'patient-id', key: '身分證字號ID' },
+        { id: 'patient-sex', key: '性別Gender' },     // <--- 使用提供的 ID
+        { id: 'patient-age', key: '年齡Age' },           // <--- 使用提供的 ID
+        // 第一組數據（術前 Pre-Op）
+        { id: 'pre-op-date', key: '日期PreOpDate' }, // 假設術前日期 ID 為 pre-op-date
+        { id: 'dr-name1', key: '醫師姓名DrName1' },   // <--- 使用提供的 ID
+        // 第二組數據（術後 Post-Op）
+        { id: 'post-op-date', key: '日期PostOpDate' },   // <--- 使用提供的 ID
+        { id: 'dr-name2', key: '醫師姓名DrName2' }    // <--- 使用提供的 ID
+    ];
+
+    infoFields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (element) {
+            data.patientInfo[field.key] = element.value ? element.value.trim() : '';
+        }
+    });
+
+    // --- 2. 收集 Plaque Score --- (保留不變)
+    const plaqueScoreInput = document.getElementById('plaqueScoreInput');
+    const plaqueScoreInput2 = document.getElementById('plaqueScoreInput2');
+    if (plaqueScoreInput) {
+        data.summary['PlaqueScore_1'] = plaqueScoreInput.value ? plaqueScoreInput.value.trim() : '';
+    }
+    if (plaqueScoreInput2) {
+        data.summary['PlaqueScore_2'] = plaqueScoreInput2.value ? plaqueScoreInput2.value.trim() : '';
+    }
+    
+
+    // --- 3. 收集 PD 數據 (保留不變) ---
+    const pdInputs = document.querySelectorAll('.pre-op-pd[data-field], .post-op-pd[data-field]');
+
+    pdInputs.forEach(input => {
+        const key = input.getAttribute('data-field');
+        if (input.value.trim() === '1') { 
+            if (input.classList.contains('pre-op-pd')) {
+                data.preOpPD[key] = '1';
+            } else if (input.classList.contains('post-op-pd')) {
+                data.postOpPD[key] = '1';
+            }
+        }
+    });
+
+    // --- 4. 收集缺牙狀態 (保留不變) ---
+    document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+        const toothNumber = checkbox.getAttribute('data-tooth');
+        data.missingTeeth[toothNumber] = checkbox.checked;
+    });
+
+    return data;
+}
+
+/**
+ * 執行數據匯出 (下載 JSON 檔案)。 (保留不變)
+ */
+function exportData() {
+    const dataToSave = getAllDataForExport();
+    // ... (下載邏輯省略，與您原有的相同)
+    const patientName = dataToSave.patientInfo['患者姓名Name'] || 'Patient';
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const safeName = patientName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '').substring(0, 20);
+    const fileName = `${safeName}_${dateStr}_PlaqueScore_Data.json`;
+    
+    const jsonString = JSON.stringify(dataToSave, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showMessage(`成功匯出數據到 ${fileName}`, 'success');
+}
+
+/**
+ * 執行數據匯入。
+ * **已更新：使用提供的 patient-sex, patient-age, dr-name1, dr-name2, post-op-date ID。**
+ * @param {HTMLInputElement} fileInput - 檔案輸入元素
+ */
+function importData(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) {
+        showMessage("請選擇一個檔案。", 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const result = JSON.parse(event.target.result);
+
+            const loadedData = {
+                patientInfo: result.patientInfo || {},
+                summary: result.summary || {},
+                preOpPD: result.preOpPD || {},
+                postOpPD: result.postOpPD || {},
+                missingTeeth: result.missingTeeth || {}
+            };
+
+            let loadedCount = 0;
+
+            // 1. 匯入基本資料 (Patient Info) - **邏輯已更新**
+            const infoFields = [
+                 // 基礎資訊
+                { id: 'patient-name', key: '患者姓名Name' },
+                { id: 'patient-id', key: '身分證字號ID' },
+                { id: 'patient-sex', key: '性別Gender' },     // <--- 使用提供的 ID
+                { id: 'patient-age', key: '年齡Age' },           // <--- 使用提供的 ID
+                // 第一組數據（術前 Pre-Op）
+                { id: 'pre-op-date', key: '日期PreOpDate' },
+                { id: 'dr-name1', key: '醫師姓名DrName1' },   // <--- 使用提供的 ID
+                // 第二組數據（術後 Post-Op）
+                { id: 'post-op-date', key: '日期PostOpDate' },   // <--- 使用提供的 ID
+                { id: 'dr-name2', key: '醫師姓名DrName2' }    // <--- 使用提供的 ID
+            ];
+            
+            infoFields.forEach(field => {
+                const value = loadedData.patientInfo[field.key];
+                const element = document.getElementById(field.id);
+                if (element && value !== undefined) {
+                    element.value = String(value);
+                    loadedCount++;
+                }
+            });
+
+
+            // 2. 匯入缺牙狀態 (保留不變)
+             document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
+                 checkbox.checked = false;
+             });
+             for (const toothNumber in loadedData.missingTeeth) {
+                 const isMissing = loadedData.missingTeeth[toothNumber];
+                 const checkbox = document.querySelector(`.missing-tooth-toggle[data-tooth="${toothNumber}"]`);
+                 if (checkbox && typeof isMissing === 'boolean') {
+                     checkbox.checked = isMissing;
+                     checkbox.dispatchEvent(new Event('change')); 
+                     loadedCount++;
+                 }
+             }
+
+            // 3. 匯入術前/術後 PD 數據 (保留不變)
+            ['preOpPD', 'postOpPD'].forEach(type => {
+                const isPreOp = type === 'preOpPD';
+                const selector = isPreOp ? '.pre-op-pd[data-field]' : '.post-op-pd[data-field]';
+
+                // 清空目標欄位
+                document.querySelectorAll(selector).forEach(input => {
+                    input.value = '';
+                    input.classList.remove('plaque-positive');
+                });
+
+                const dataMap = loadedData[type];
+                for (const dataField in dataMap) {
+                    const value = dataMap[dataField]; 
+                    const input = document.querySelector(`.${isPreOp ? 'pre-op-pd' : 'post-op-pd'}[data-field="${dataField}"]`);
+
+                    // 檢查輸入框是否啟用，如果缺牙被禁用則跳過
+                    if (input && !input.disabled && value === '1') {
+                        input.value = '1';
+                        input.classList.add('plaque-positive');
+                        loadedCount++;
+                    }
+                }
+            });
+            
+            // 4. 匯入 Plaque Score (保留不變)
+             const plaqueInput1 = document.getElementById('plaqueScoreInput');
+             const plaqueInput2 = document.getElementById('plaqueScoreInput2');
+
+             // 嘗試從匯入資料載入 Plaque Score
+             if (plaqueInput1 && loadedData.summary['PlaqueScore_1'] !== undefined) {
+                 plaqueInput1.value = String(loadedData.summary['PlaqueScore_1']);
+                 plaqueInput1.dispatchEvent(new Event('input')); 
+                 loadedCount++;
+             } else {
+                 calculatePercentage('.pre-op-pd', 'plaqueScoreInput');
+             }
+             
+             if (plaqueInput2 && loadedData.summary['PlaqueScore_2'] !== undefined) {
+                 plaqueInput2.value = String(loadedData.summary['PlaqueScore_2']);
+                 plaqueInput2.dispatchEvent(new Event('input')); 
+                 loadedCount++;
+             } else {
+                 calculatePercentage('.post-op-pd', 'plaqueScoreInput2');
+             }
+
+            showMessage(`成功匯入 ${loadedCount} 個數據到各欄位。`, 'success');
+            // 確保計算結果更新 (總齒數)
+            updateTotalTeethCount();
+            initializeFocusOrder(); 
+
+        } catch (error) {
+            console.error("JSON 解析或數據匯入失敗:", error);
+            showMessage("解析 JSON 檔案失敗或數據結構錯誤。", 'error');
+        } finally {
+            fileInput.value = '';
+        }
+    };
+
+    reader.onerror = () => {
+        showMessage("讀取檔案時發生錯誤。", 'error');
+    };
+
+    reader.readAsText(file);
+}
+// ===============================================
+// 7. UI 輔助功能 (訊息提示與設定切換)
+// ===============================================
+
+// (showMessage 函數內容保持不變，此處省略)
+function showMessage(message, type = 'info') {
+    const messageBox = document.getElementById('messageBox');
+    if (!messageBox) return;
+
+    messageBox.textContent = message;
+    messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-gray-100', 'text-gray-700');
+
+    if (type === 'error') {
+        messageBox.classList.add('bg-red-100', 'text-red-700');
+    } else if (type === 'success') {
+        messageBox.classList.add('bg-green-100', 'text-green-700');
+    } else {
+        messageBox.classList.add('bg-gray-100', 'text-gray-700');
+    }
+
+    messageBox.classList.remove('hidden');
+
+    setTimeout(() => {
+        messageBox.classList.add('hidden');
+    }, 3000);
+}
+
+// (toggleSettings 函數內容保持不變，此處省略)
+function toggleSettings() {
+    const settingsArea = document.getElementById('settings-area');
+    const toggleButton = document.getElementById('settings-toggle-btn');
+
+    if (!settingsArea || !toggleButton) return;
+
+    if (settingsArea.classList.contains('hidden')) {
+        settingsArea.classList.remove('hidden');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        toggleButton.textContent = '設定 (點擊隱藏)';
+    } else {
+        settingsArea.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.textContent = '設定 (點擊開啟)';
+    }
+}
+
+
+// ===============================================
+// 8. 初始化和事件監聽
+// ===============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. 初始化兩組 Plaque Score 模擬器
+    // 數據組 1
+    initializePlaqueSimulator('plaqueScoreInput', '.pre-op-pd'); 
+    // 數據組 2 (使用您提供的 ID 和 Class)
+    initializePlaqueSimulator('plaqueScoreInput2', '.post-op-pd'); 
+
+    // 2. 呼叫 initializeFocusOrder 來建立初始 PD 欄位順序列表
+    initializeFocusOrder();
+
+    // 3. PD 輸入欄位事件綁定 (應用新的 '只能輸入 1' 規則)
+    const allPdInputs = document.querySelectorAll('.pre-op-pd, .post-op-pd');
+
+    allPdInputs.forEach(input => {
+        // 根據 class 判斷它屬於哪一組，傳入對應的 Plaque Score ID 和 Class
+        const isPreOp = input.classList.contains('pre-op-pd');
+        const plaqueInputID = isPreOp ? 'plaqueScoreInput' : 'plaqueScoreInput2';
+        const inputClass = isPreOp ? '.pre-op-pd' : '.post-op-pd';
+
+        // 初始驗證 (針對頁面載入時可能有的值)
+        applyOneOnlyValidation(input, plaqueInputID, inputClass);
+
+        // a. Input 事件: 驗證、百分比反向計算 和 自動跳格 (輸入 '1' 時跳格)
+        input.addEventListener('input', (event) => {
+            const currentInput = event.target;
+            const oldValue = currentInput.value;
+            
+            // 執行驗證 (會同時更新百分比)
+            applyOneOnlyValidation(currentInput, plaqueInputID, inputClass); 
+
+            // --- 自動跳格邏輯 ---
+            // 只要最終值為 '1' 就自動跳格
+            if (currentInput.value === '1') {
+                focusNextEnabledInput(currentInput);
+            }
+            // ---------------------
+        });
+
+        // b. Blur 事件: 再次應用驗證確保離開時數值正確
+        input.addEventListener('blur', (event) => {
+            applyOneOnlyValidation(event.target, plaqueInputID, inputClass);
+        });
+
+        // c. Keydown 事件: 處理方向鍵 (左右) 和 Tab/Enter 鍵的導航
+        input.addEventListener('keydown', handleKeyNavigation);
+    });
+
+    // 4. 缺牙切換鈕事件 (兩組數據聯動)
+    document.querySelectorAll('.missing-tooth-toggle').forEach(toggle => {
+        toggle.addEventListener('change', (event) => {
+            handleMissingTooth(event.target);
+            // 重新初始化導航順序，因為某些欄位被啟用/禁用
+            initializeFocusOrder(); 
+            // Plaque Score 的重新計算已在 initializePlaqueSimulator 裡綁定 'change'
+        });
+        // 初始檢查缺牙狀態 (會觸發 handleMissingTooth 內的總齒數計算)
+        handleMissingTooth(toggle);
+    });
+    
+    // 5. 初始計算總齒數
+    updateTotalTeethCount();
+
+    // 6. 綁定功能按鈕事件
+    document.getElementById('clearDataBtn')?.addEventListener('click', clearAllInputs);
+    // document.getElementById('copyDataBtn') 已被移除
+
+    // 7. 綁定設定切換 (保留)
+    const toggleButton = document.getElementById('settings-toggle-btn');
+    const settingsArea = document.getElementById('settings-area');
+    if (toggleButton && settingsArea) {
+        // 預設狀態: 開啟
+        settingsArea.classList.remove('hidden');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        toggleButton.textContent = '設定 (點擊隱藏)';
+        toggleButton.onclick = toggleSettings;
+    }
+
+    // 8. 暴露給全域環境，以供 HTML 中直接呼叫
+    window.initializeFocusOrder = initializeFocusOrder;
+    window.handleMissingTooth = handleMissingTooth;
+    window.exportData = exportData;
+    window.importData = importData;
+    window.clearAllInputs = clearAllInputs;
+    window.toggleSettings = toggleSettings;
+});
+
+// 註解：已刪除 'updatePathologyCount'、'copyPreOpToPostOp'、'generatePostOpValue'
+</script>
+
+
+
+
+</body>
+</html>
