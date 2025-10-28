@@ -275,10 +275,9 @@
 </div>
 
 </div>
-<div style="height: 30px;"></div>
 <!-- 載入 Tailwind CSS (確保您的主文件中已有此行) -->
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-
+<div style="height: 30px;"></div>
 <div class="container mx-auto p-4 space-y-8">
     <h1 class="text-3xl font-extrabold text-blue-800 mb-6 border-b-4 border-blue-200 pb-2">基本資料</h1>
 
@@ -1380,7 +1379,7 @@ function clearAllInputs() {
         // 對 <select> (例如性別) 進行清空
         if (input.tagName === 'SELECT') {
              // 確保選擇第一個選項 (通常是空白或預設值)
-            input.selectedIndex = 0; 
+             input.selectedIndex = 0; 
         } else if (input.type !== 'checkbox' && input.value !== '') {
             input.value = '';
             clearedCount++;
@@ -1434,7 +1433,7 @@ function getAllDataForExport() {
         { id: 'patient-name', key: '患者姓名Name' },
         { id: 'patient-id', key: '身分證字號ID' },
         { id: 'patient-sex', key: '性別Gender' },     // <--- 使用提供的 ID
-        { id: 'patient-age', key: '年齡Age' },           // <--- 使用提供的 ID
+        { id: 'patient-age', key: '年齡Age' },            // <--- 使用提供的 ID
         // 第一組數據（術前 Pre-Op）
         { id: 'pre-op-date', key: '日期PreOpDate' }, // 假設術前日期 ID 為 pre-op-date
         { id: 'dr-name1', key: '醫師姓名DrName1' },   // <--- 使用提供的 ID
@@ -1485,15 +1484,27 @@ function getAllDataForExport() {
 }
 
 /**
- * 執行數據匯出 (下載 JSON 檔案)。 (保留不變)
+ * 執行數據匯出 (下載 JSON 檔案)。
+ * **已更新：檔案名稱現在包含 病人姓名、ID 和當前日期。**
  */
 function exportData() {
     const dataToSave = getAllDataForExport();
-    // ... (下載邏輯省略，與您原有的相同)
+    
+    // 獲取病人資訊
     const patientName = dataToSave.patientInfo['患者姓名Name'] || 'Patient';
+    const patientId = dataToSave.patientInfo['身分證字號ID'] || 'NoID';
+    
+    // 獲取匯出日期（當前日期）
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const safeName = patientName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '').substring(0, 20);
-    const fileName = `${safeName}_${dateStr}_PlaqueScore_Data.json`;
+    
+    // 清理和限制名稱長度（允許中文）
+    const safeName = patientName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '').substring(0, 20) || 'Patient';
+    
+    // 清理 ID (只允許字母和數字，因為ID可能包含 '-' 或其他符號，但為了檔名安全，我們只保留文字和數字)
+    const safeId = patientId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 20) || 'NoID';
+
+    // 🌟 更新檔名結構：[PatientName]_[PatientID]_[Date]_[PlaqueScore]_Data.json
+    const fileName = `${safeName}_${safeId}_${dateStr}_PlaqueScore_Data.json`;
     
     const jsonString = JSON.stringify(dataToSave, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -1543,7 +1554,7 @@ function importData(fileInput) {
                 { id: 'patient-name', key: '患者姓名Name' },
                 { id: 'patient-id', key: '身分證字號ID' },
                 { id: 'patient-sex', key: '性別Gender' },     // <--- 使用提供的 ID
-                { id: 'patient-age', key: '年齡Age' },           // <--- 使用提供的 ID
+                { id: 'patient-age', key: '年齡Age' },            // <--- 使用提供的 ID
                 // 第一組數據（術前 Pre-Op）
                 { id: 'pre-op-date', key: '日期PreOpDate' },
                 { id: 'dr-name1', key: '醫師姓名DrName1' },   // <--- 使用提供的 ID
@@ -1611,6 +1622,7 @@ function importData(fileInput) {
                  plaqueInput1.dispatchEvent(new Event('input')); 
                  loadedCount++;
              } else {
+                 // 如果匯入資料沒有，則重新計算
                  calculatePercentage('.pre-op-pd', 'plaqueScoreInput');
              }
              
@@ -1619,6 +1631,7 @@ function importData(fileInput) {
                  plaqueInput2.dispatchEvent(new Event('input')); 
                  loadedCount++;
              } else {
+                 // 如果匯入資料沒有，則重新計算
                  calculatePercentage('.post-op-pd', 'plaqueScoreInput2');
              }
 
@@ -1641,6 +1654,7 @@ function importData(fileInput) {
 
     reader.readAsText(file);
 }
+
 // ===============================================
 // 7. UI 輔助功能 (訊息提示與設定切換)
 // ===============================================
@@ -1786,6 +1800,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
-
-
