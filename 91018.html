@@ -393,6 +393,25 @@
         <table id="preOpUpperTable" class="pd-chart-table">
             <thead>
                 <tr>
+                    <th>Note</th>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N1" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N2" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N3" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N4" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N5" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N6" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N7" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N8" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N9" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N10" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N11" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N12" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N13" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N14" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N15" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="N16" value="" placeholder=""></td>
+                </tr>
+				<tr>
                     <th>Mobility</th>
                     <!-- M1 to M16 are 16 teeth groups, each uses colspan="3", total 48 input columns -->
                     <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="M1" value="" placeholder=""></td>
@@ -823,6 +842,25 @@
                     <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LM14" value="" placeholder=""></td>
                     <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LM15" value="" placeholder=""></td>
                     <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LM16" value="" placeholder=""></td>
+                </tr>
+								<tr>
+                    <th>Note</th>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN1" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN2" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN3" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN4" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN5" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN6" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN7" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN8" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN9" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN10" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN11" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN12" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN13" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN14" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN15" value="" placeholder=""></td>
+                    <td colspan="3" class="input-cell-container"><input type="text" class="input-cell pre-op-manual" data-manual-id="LN16" value="" placeholder=""></td>
                 </tr>
             </tbody>
         </table>
@@ -2395,19 +2433,23 @@ function getAllDataForExport() {
         patientInfo: {},
         summary: {},
         preOpPD: {},
-        postOpPD: {},
+        postOpPD: {}, // 包含 Probing Depth 等術後核心 PD 數據
         plaque91018: {}, 
-        missingTeeth: {}
+        missingTeeth: {},
+        // manualNotes 現在儲存帶有 'pre-' 或 'post-' 前綴的唯一鍵
+        manualNotes: {} 
     };
 
     // --- 1. 收集基本資料與醫師資訊 (處理同步和非同步欄位) ---
     const exportedKeys = new Set();
+    // 假設 PATIENT_INFO_FIELDS_MAP 是一個已定義的常數
     PATIENT_INFO_FIELDS_MAP.forEach(field => {
         if (exportedKeys.has(field.key)) return; 
 
         let value = '';
         
         if (field.isSync) {
+            // 假設 SYNC_INPUT_CLASS 是一個已定義的常數
             document.querySelectorAll(`${SYNC_INPUT_CLASS}[data-sync-group="${field.syncGroup}"]`).forEach(input => {
                 if (input.value.trim() !== '') {
                     value = input.value.trim();
@@ -2430,6 +2472,7 @@ function getAllDataForExport() {
     const summaryFields = [
         { id: 'post-op-improved-teeth', key: '治療後改善齒數ImprovedTeethCount', type: 'input' },
         { id: 'post-op-improvement-rate', key: '改善率ImprovementRate', type: 'input' },
+        // 假設 PLAQUE_SCORE_ID 是一個已定義的常數
         { id: PLAQUE_SCORE_ID, key: 'Plaque百分比PlaquePercent', type: 'input' },
         { id: 'pre-op-total-teeth', key: '治療前總齒數TotalTeethCount', type: 'span' },
         { id: 'pathology-tooth-count', key: '治療前囊袋5mm齒數PathologyTeethCount', type: 'span' },
@@ -2447,28 +2490,39 @@ function getAllDataForExport() {
         }
     });
 
-    // --- 3. 收集 PD 和 Plaque 數據 ---
-    // 確保選擇器正確地包含了所有數據輸入框
-    const allDataInputs = document.querySelectorAll(`.pre-op-pd[data-field]:not([disabled]), .post-op-pd[data-field]:not([disabled]), ${PLAQUE_INPUT_CLASS}[data-field]:not([disabled])`);
+    // --- 3. 收集 PD 數據 ---
+    
+    // 3a. 收集所有 Pre-Op 和 Post-Op PD 欄位
+    // 核心 PD 數據 (PD) 只有在有值時才匯出
+    const pdDataInputs = document.querySelectorAll(`.pre-op-pd[data-field]:not([disabled]), .post-op-pd[data-field]:not([disabled])`);
 
-    allDataInputs.forEach(input => {
+    pdDataInputs.forEach(input => {
         const key = input.getAttribute('data-field');
         const value = input.value.trim();
         
         if (value === '') return; // 值為空則跳過
 
-        // *** 修正後的優先檢查邏輯 ***
+        // 排除 Plaque 欄位，Plaque 應由 3b 獨立處理
+        // 假設 Plaque 欄位同時有 .post-op-pd 和一個獨立的 Plaque Class
         if (input.classList.contains(PLAQUE_INPUT_CLASS.substring(1))) {
-            // Plaque 欄位: 優先檢查並只匯出值為 '1' 的位置
-            if (value === '1') {
-                data.plaque91018[key] = '1';
-            }
-        } else if (input.classList.contains('pre-op-pd')) {
+            return;
+        }
+
+        if (input.classList.contains('pre-op-pd')) {
             // Pre-Op PD 欄位
             data.preOpPD[key] = value;
         } else if (input.classList.contains('post-op-pd')) {
-            // Post-Op PD 欄位 (非 Plaque 的 Post-Op 欄位)
+            // Post-Op PD 欄位
             data.postOpPD[key] = value;
+        }
+    });
+    
+    // 3b. 收集 Plaque 數據 (獨立處理，只匯出值為 '1' 的位置)
+    // 假設 PLAQUE_INPUT_CLASS 是一個已定義的常數
+    document.querySelectorAll(`${PLAQUE_INPUT_CLASS}[data-field]:not([disabled])`).forEach(input => {
+        const key = input.getAttribute('data-field');
+        if (input.value.trim() === '1') {
+            data.plaque91018[key] = '1';
         }
     });
 
@@ -2477,6 +2531,31 @@ function getAllDataForExport() {
     document.querySelectorAll('.missing-tooth-toggle').forEach(checkbox => {
         const toothNumber = checkbox.getAttribute('data-tooth');
         data.missingTeeth[toothNumber] = checkbox.checked;
+    });
+
+    // --- 5. 收集手動筆記數據 (Manual Notes) ---
+    // Mobility (M1-M16), Furcation (F1-F16) 都是使用 post-op-manual
+    // 為了解決術前/術後欄位名稱重複問題，我們將在 key 中加入前綴 (pre-/post-)
+    document.querySelectorAll('.input-cell.pre-op-manual[data-manual-id], .input-cell.post-op-manual[data-manual-id]').forEach(input => {
+        const baseKey = input.getAttribute('data-manual-id');
+        const value = input.value.trim();
+        
+        // 只有在值非空時才匯出
+        if (value !== '') {
+            let uniqueKey;
+            
+            if (input.classList.contains('pre-op-manual')) {
+                // 術前手動欄位 (例如: pre-M1, pre-LMF1)
+                uniqueKey = `pre-${baseKey}`;
+            } else if (input.classList.contains('post-op-manual')) {
+                // 術後手動欄位 (例如: post-M1, post-F1, post-LM1)
+                uniqueKey = `post-${baseKey}`;
+            }
+
+            if (uniqueKey) {
+                data.manualNotes[uniqueKey] = value;
+            }
+        }
     });
 
     return data;
@@ -2499,7 +2578,9 @@ function exportData() {
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 
-    const fileName = `${safeName}_${safeId}_${dateStr}_Periodontal_Data.json`;
+    // ********** 檔案名稱已修改 **********
+    const fileName = `${safeName}_${safeId}_${dateStr}_91018.json`;
+    // **********************************
 
     const jsonString = JSON.stringify(dataToSave, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -2513,6 +2594,7 @@ function exportData() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    // 計算所有物件中屬性的總數，現在包含 manualNotes
     let totalCount = Object.values(dataToSave).reduce((sum, obj) => sum + Object.keys(obj).length, 0);
 
     showMessage(`成功匯出 ${totalCount} 個數據到 ${fileName}`, 'success');
@@ -2544,7 +2626,8 @@ function importData(fileInput) {
                 preOpPD: result.preOpPD || result,
                 postOpPD: result.postOpPD || {},
                 plaque91018: result.plaque91018 || {},
-                missingTeeth: result.missingTeeth || {}
+                missingTeeth: result.missingTeeth || {},
+                manualNotes: result.manualNotes || {} // 載入手動筆記
             };
 
             let loadedCount = 0;
@@ -2569,19 +2652,18 @@ function importData(fileInput) {
                 }
             }
             
-            // --- 2. 匯入 PD 和 Plaque Grids 數據 (確保欄位有值) ---
+            // --- 2. 匯入 PD、Mobility、Furcation 和 Plaque Grids 數據 ---
              ['preOpPD', 'postOpPD', 'plaque91018'].forEach(type => {
                 let selector, className;
                 if (type === 'preOpPD') {
                     selector = '.pre-op-pd[data-field]'; className = 'pre-op-pd';
                 } else if (type === 'postOpPD') {
-                    // 對於 Plaque 和 PostOpPD 混用的欄位，先處理 Plaque，再處理 PostOpPD (如果它們的值不是 '1')
                     selector = '.post-op-pd[data-field]'; className = 'post-op-pd'; 
                 } else {
                     selector = PLAQUE_INPUT_CLASS + '[data-field]'; className = PLAQUE_INPUT_CLASS.substring(1);
                 }
 
-                // 清空目標欄位 (雖然 clearAllInputs 已經執行，但再次清空目標確保)
+                // 清空目標欄位
                 document.querySelectorAll(selector).forEach(input => {
                     input.value = '';
                     input.classList.remove('value-ge-5', 'plaque-1-highlight');
@@ -2603,12 +2685,12 @@ function importData(fileInput) {
                                 input.classList.add('plaque-1-highlight'); 
                                 loadedCount++;
                             } else if (type !== 'plaque91018') {
-                                // PD 欄位匯入 (忽略那些同時也是 Plaque 欄位的 PD 值)
+                                // PD 欄位匯入 (Mobility/Furcation 已移至 Step 5)
                                 if (!isPlaqueInput || type === 'preOpPD') { 
                                      input.value = String(value);
                                      applyHighlight(input);
                                      loadedCount++;
-                                }
+                                 }
                             }
                         }
                     }
@@ -2656,7 +2738,43 @@ function importData(fileInput) {
                 }
             });
 
-            // --- 5. Plaque 邏輯最終調整 (Plaque Grid 優先原則) ---
+            // --- 5. 匯入手動筆記數據 (Manual Notes) ---
+            // 5.1. 先清空所有手動筆記欄位 (包含術前 pre-op 和術後 post-op)
+            document.querySelectorAll('.input-cell.pre-op-manual[data-manual-id], .input-cell.post-op-manual[data-manual-id]').forEach(input => {
+                input.value = '';
+            });
+
+            const manualNotesMap = loadedData.manualNotes;
+            for (const uniqueKey in manualNotesMap) {
+                if (manualNotesMap.hasOwnProperty(uniqueKey)) {
+                    const value = manualNotesMap[uniqueKey];
+                    
+                    let className = '';
+                    let baseKey = uniqueKey; // 原始的 data-manual-id (例如 M1)
+
+                    // 根據前綴判斷類別，並取出原始 key
+                    if (uniqueKey.startsWith('pre-')) {
+                        className = '.pre-op-manual';
+                        baseKey = uniqueKey.substring(4); // 移除 'pre-'
+                    } else if (uniqueKey.startsWith('post-')) {
+                        className = '.post-op-manual';
+                        baseKey = uniqueKey.substring(5); // 移除 'post-'
+                    } else {
+                        // 如果沒有前綴，則跳過或使用舊的邏輯處理 (為了處理舊版檔案，但建議跳過)
+                        continue; 
+                    }
+                    
+                    // 使用特定的 class 和原始 key (例如 .post-op-manual[data-manual-id="M1"]) 精確查找
+                    const input = document.querySelector(`${className}[data-manual-id="${baseKey}"]`);
+
+                    if (input) {
+                        input.value = String(value || ''); 
+                        loadedCount++;
+                    }
+                }
+            }
+            
+            // --- 6. Plaque 邏輯最終調整 (Plaque Grid 優先原則) ---
             
             // 檢查是否有匯入 Plaque Grid 數據 (即匯出文件中有 Plaque Grid 記錄)
             const hasGridData = Object.keys(loadedData.plaque91018).length > 0;
@@ -2691,6 +2809,10 @@ function importData(fileInput) {
 
     reader.readAsText(file);
 }
+
+
+
+
 
 // ===============================================
 // 9. 初始化和事件監聽
@@ -2795,6 +2917,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
-
-
