@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>牙周統合照護計畫表單</title>
+    
+    <style>
+        /* 基礎設定與字體 */
+        :root {
+            --primary-color: #007bff; /* 主色調 - 藍色 */
+            --secondary-color: #28a745; /* 副色調 - 綠色 */
+            --tertiary-color: #ffc107; /* 第三色調 - 黃色 */
+            --background-color: #f8f9fa; /* 背景色 - 淺灰色 */
+            --text-color: #343a40; /* 文字色 - 深灰色 */
+            --white: #ffffff;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        /* 容器設定 */
+        .container {
+            max-width: 960px; /* 限制最大寬度 */
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* 標題設定 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+        }
+
+        /* 按鈕區域 (Flexbox 佈局) */
+        .button-section {
+            display: flex;
+            flex-direction: row; /* 桌面版：橫向排列 */
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px; /* 按鈕間距 */
+            margin-bottom: 40px;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            display: block; /* 讓按鈕佔滿可用寬度 */
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            flex-grow: 1; /* 使每個按鈕在桌面版時平均分配空間 */
+            min-width: 180px; /* 最小寬度，防止文字過度壓縮 */
+        }
+
+        /* 主要按鈕顏色 */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: 2px solid var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: 2px solid var(--secondary-color);
+        }
+        .btn-secondary:hover {
+            background-color: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        .btn-tertiary {
+            background-color: var(--tertiary-color);
+            color: var(--text-color); /* 黃色背景搭配深色字體 */
+            border: 2px solid var(--tertiary-color);
+        }
+        .btn-tertiary:hover {
+            background-color: #d39e00;
+            transform: translateY(-2px);
+        }
+
+        /* 使用說明區塊 */
+        .instructions {
+            padding: 25px;
+            background-color: #e9f7ef; /* 淺綠色背景，與計畫相關 */
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--secondary-color);
+            margin-bottom: 30px;
+        }
+
+        .instructions h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+            list-style: disc;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .note {
+            font-style: italic;
+            color: #6c757d;
+            margin-top: 15px;
+        }
+
+        /* 頁腳 */
+        footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* ====================================
+           響應式設計 (RWD) - 手機版調整
+           ==================================== */
+        @media (max-width: 768px) {
+            /* 當螢幕寬度小於或等於 768px (例如手機和平板) */
+
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 2rem; /* 標題縮小 */
+            }
+
+            /* 手機版：按鈕改為垂直堆疊 */
+            .button-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            /* 手機版：按鈕寬度佔滿整個容器 */
+            .btn {
+                width: 100%;
+                font-size: 1rem;
+            }
+
+            .instructions {
+                padding: 15px;
+            }
+
+            .instructions h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>牙周統合照護計畫表單</h1>
+        </header>
+
+        <main class="button-section">
+            <a href="https://ivy2270.github.io/perio/probing.html" class="btn btn-primary">
+                牙周探測紀錄表
+            </a>
+            <a href="https://ivy2270.github.io/perio/plaque.html" class="btn btn-secondary">
+                牙菌斑控制紀錄表
+            </a>
+            <a href="https://ivy2270.github.io/perio/91018.html" class="btn btn-tertiary">
+                91018 表單
+            </a>
+        </main>
+
+        <section class="instructions">
+            <h2>使用說明</h2>
+            <p>
+                本頁面提供牙周統合照護計畫所需的三個主要表單：
+            </p>
+            <ul>
+                <li><b>牙周探測紀錄表</b>：用於記錄術前/術後牙周囊袋深度等探測數據</li>
+                <li><b>牙菌斑控制紀錄表</b>：用於追蹤病患的口腔衛生習慣與牙菌斑控制效果</li>
+                <li><b>91018 項目表單</b>：91018C申報需檢附的牙周探測紀錄表及牙菌斑控制紀錄表</li>
+				<li>牙位格子內的核取方塊打勾表示該牙位缺牙（或阻生、植牙、待拔牙等），會自動關閉數據輸入欄位</li>
+            </ul>
+			<h2>注意事項</h2>
+			<ul>
+                <li>請在平板或電腦裝置使用，因表格格數眾多，手機版無法正確顯示所有資料</li>
+                <li>iPad建議安裝gboard鍵盤，方便連續輸入數字</li>
+                <li>病患數據填寫完成後務必截圖保存或匯出json檔，網頁關閉後將清空所有資料</li>
+            </ul>
+            <p class="note">
+                表單內建計算功能，請自行驗算結果。
+            </p>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 牙周統合照護計畫</p>
+        </footer>
+    </div>
+</body>
+</html>
