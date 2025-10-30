@@ -8,6 +8,7 @@
           href="https://ymdd-image-tw.s3.ap-east-2.amazonaws.com/image/tooth-svgrepo-com.svg" 
           type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* 基礎表格樣式 */
         table, th, td { 
@@ -36,7 +37,6 @@
         .input-cell-container {
             padding: 0; 
             height: 30px; /* 給予一個固定的高度，確保行高一致 */
-            line-height: 30px;
         }
         
         /* ============== 表格佈局關鍵樣式 (確保上下對齊) ============== */
@@ -76,17 +76,27 @@
         }
         
         /* ============== 輸入框樣式 ============== */
-        .input-cell { 
-            width: 100%; 
-            height: 100%; 
-            box-sizing: border-box; 
-            border: none; 
-            text-align: center; 
-            padding: 5px 2px; /* 垂直 5px，水平 2px */
-            background-color: transparent; 
-            transition: background-color 0.2s;
-            line-height: normal;
-        }
+		.input-cell { 
+			width: 100%; 
+			height: 100%; 
+			box-sizing: border-box; 
+			border: none; 
+			text-align: center; 
+			
+			/* 💡 垂直 padding 仍保留，但可能是造成截斷的主因 */
+			/* 建議將 padding 設小，或完全依賴 flex/grid 來置中 */
+			padding: 2px 2px; /* 將垂直 padding 從 5px 縮小至 2px */
+			
+			background-color: transparent; 
+			transition: background-color 0.2s;
+			
+			/* 💡 關鍵：將 line-height 設為與 font-size 接近的值，以確保文字垂直置中 */
+			/* 假設 font-size 是 14px (繼承自 table) */
+			line-height: 1.4; /* 標準行高，或直接設為 14px */
+			
+			/* 確保文字不會因為 line-height 被 TD 截斷 */
+			overflow: visible; 
+		}
 
         .input-cell:focus {
             outline: 2px solid #4CAF50; 
@@ -199,8 +209,9 @@
 <body class="bg-gray-50 p-6 font-sans">
 <!-- ============================================= -->
 <!-- 1. 設定切換按鈕 -->
-<!-- ============================================= -->
-<div class="flex justify-center my-4">
+<!-- ============================================= -->   
+<div class="flex justify-center space-x-4 my-4"> 
+    
     <button
         id="settings-toggle-btn"
         type="button"
@@ -211,7 +222,17 @@
     >
         設定
     </button>
+    
+    <button
+        id="screenshotButton"
+        type="button"
+        class="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+    >
+        全頁截圖
+    </button>
 </div>
+
+</body>
 
 
 <!-- ============================================= -->
@@ -1340,38 +1361,29 @@
         </div>
     </div>
 
-    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 mt-6">術後評估</h3>
+<h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 mt-6">術後評估</h3>
 
-    <!-- 下方：手動輸入欄位 -->
-    <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-8">
-        <!-- 1. 治療後改善齒數 -->
-        <div class="flex items-center flex-1">
-            <label for="post-op-improvement-count" class="text-gray-700 font-semibold text-base mr-3 whitespace-nowrap">治療後至少一個部位改善2mm齒數：</label>
-            <input 
-                type="text" 
-                id="post-op-improvement-count" 
-                class="form-input w-24 p-2 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-xl text-center"
-                placeholder="0"
-                inputmode="numeric" 
-                pattern="[0-9]*"
-            />
-            <span class="ml-2 text-xl font-bold text-gray-700">顆</span>
-        </div>
-
-        <!-- 2. 改善率 -->
-        <div class="flex items-center flex-1">
-            <label for="improvement-rate" class="text-gray-700 font-semibold text-base mr-3 whitespace-nowrap">改善率：</label>
-            <input 
-                type="text" 
-                id="improvement-rate" 
-                class="form-input w-24 p-2 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-xl text-center"
-                placeholder="0.00"
-            />
-            <span class="ml-2 text-xl font-bold text-gray-700">%</span>
+<div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-8 md:items-start">
+    
+    <div class="flex-1"> 
+        <div class="flex items-center bg-yellow-50 p-3 rounded-lg"> 
+            <span class="text-gray-700 font-semibold text-base md:text-lg mr-2 whitespace-nowrap">治療後至少一個部位改善2mm齒數：</span>
+            <span id="post-op-improvement-count" class="text-xl md:text-2xl font-bold text-yellow-600">0 顆</span>
         </div>
     </div>
-</div>
 
+    <div class="flex flex-col flex-1">
+        <div class="flex items-center bg-green-50 p-3 rounded-lg">
+            <span class="text-gray-700 font-semibold text-base md:text-lg mr-2 whitespace-nowrap">改善率：</span>
+            <span id="improvement-rate" class="text-xl md:text-2xl font-bold text-green-600">0.00 %</span>
+        </div>
+        <p id="improvement-rate-warning" class="text-red-600 font-bold mt-1 text-sm hidden">
+            ⚠️ 警告文字範例，這會增加此容器的高度。
+        </p>
+    </div>
+</div>
+</div>
+<div style="height: 40px;"></div>
 
 <script>
 /**
@@ -1477,6 +1489,98 @@ function clearAllInputs() {
         showMessage("所有輸入欄位都已經是空的。", 'info');
     }
 }
+
+// ===============================================
+// 2.5 全頁截圖功能
+// ===============================================
+
+document.getElementById('screenshotButton').addEventListener('click', function() {
+    
+    const targetElement = document.body; 
+    const screenshotButton = this;
+    const VERTICAL_OFFSET = -2; 
+    
+    // 1. 隱藏按鈕
+    const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+    settingsToggleBtn.style.visibility = 'hidden';
+    screenshotButton.style.visibility = 'hidden'; 
+
+    // 2. 暫時將表單元素替換為 <span>
+    const formControls = targetElement.querySelectorAll('.input-cell, select, input[type="text"]');
+    const placeholders = [];
+
+    formControls.forEach(input => {
+        let displayValue = '';
+        
+        if (input.tagName === 'SELECT') {
+            const selectElement = input;
+            if (selectElement.selectedIndex >= 0) {
+                 displayValue = selectElement.options[selectElement.selectedIndex].text; 
+            }
+        } else if (input.tagName === 'INPUT') {
+            displayValue = input.value;
+        }
+
+        if (displayValue !== '') {
+            const span = document.createElement('span');
+            span.className = input.className + ' screenshot-temp-text'; 
+            span.textContent = displayValue;
+            span.style.cssText = input.style.cssText;
+            if (input.classList.contains('value-ge-5')) {
+                span.classList.add('value-ge-5');
+            }
+            input.parentNode.appendChild(span);
+            input.style.display = 'none';
+            placeholders.push({ input: input, span: span });
+        }
+    });
+
+    // 3. 延遲執行截圖
+    setTimeout(() => {
+        html2canvas(targetElement, {
+            scale: 2, 
+            useCORS: true, 
+            background: '#f9fafb',
+            y: VERTICAL_OFFSET, 
+            
+        }).then(function(canvas) {
+            
+            // 4. 恢復 <input>/<select>
+            placeholders.forEach(item => {
+                item.input.style.display = 'block'; 
+                item.span.remove(); 
+            });
+
+            // 5. 恢復按鈕顯示
+            settingsToggleBtn.style.visibility = 'visible';
+            screenshotButton.style.visibility = 'visible';
+
+            // 6. 💡 關鍵調整：生成可讀檔名
+            const now = new Date();
+            // 輔助函式：確保數字是兩位數 (例如 5 -> 05)
+            const pad = (n) => String(n).padStart(2, '0');
+            
+            const year = now.getFullYear();
+            // 月份是從 0 開始的，所以需要 +1
+            const month = pad(now.getMonth() + 1); 
+            const day = pad(now.getDate());
+            const hours = pad(now.getHours());
+            const minutes = pad(now.getMinutes());
+            
+            // 格式：webpage-report-YYYYMMDD-HHMM.jpg
+            const filename = `probing-${year}${month}${day}-${hours}${minutes}.jpg`;
+            
+            // 下載邏輯 (JPG 格式)
+            var image = canvas.toDataURL("image/jpeg", 0.95); 
+            
+            var link = document.createElement('a');
+            link.download = filename; 
+            link.href = image;
+            link.click();
+            link.remove();
+        });
+    }, 50); 
+});
 
 // ===============================================
 // 3. 核心數據處理：驗證與高亮
@@ -1682,14 +1786,135 @@ function handleKeyNavigation(event) {
 }
 
 // ===============================================
-// 5. 牙齒狀態與統計功能 (缺牙與病理顆數)
+// 5. 牙齒計算核心函數 (包含缺牙、病理顆數、術後改善及改善率)
+// 必須在初始化程式碼前定義這些函數
 // ===============================================
+
+// 假設 INITIAL_TOTAL_TEETH 已經定義，例如: const INITIAL_TOTAL_TEETH = 32;
+
+/**
+ * 統計術後改善齒數並計算改善率。
+ * 規則：每顆牙的 6 個欄位中，如果任一欄位滿足「術前數值為紅字 AND 術後數值比術前少 2 以上」，
+ * 則該牙齒計為一顆「術後改善齒數」。
+ * 假設：'value-ge-5' class 代表術前數值符合「紅字」（≥ 5mm）。
+ */
+function updatePostOpEvaluation() {
+    const improvedTeeth = new Set();
+    const allPreOpInputs = document.querySelectorAll('.pre-op-pd');
+
+    // 1. 計算術後改善齒數 (根據新規則)
+    allPreOpInputs.forEach(preOpInput => {
+        // 僅處理未禁用 (非缺牙) 的輸入框
+        if (preOpInput.disabled) return; 
+
+        // 檢查術前數值是否為紅字 (假設紅字的條件是 class 包含 'value-ge-5')
+        // 註: 此處依賴 applyHighlight 函數在輸入時正確添加 'value-ge-5' class
+        const isRed = preOpInput.classList.contains('value-ge-5');
+        const preOpValue = parseInt(preOpInput.value.trim(), 10);
+
+        if (!isNaN(preOpValue) && isRed) {
+            const dataField = preOpInput.getAttribute('data-field'); 
+            const toothNumber = dataField.split('-')[0]; // 取得牙齒編號，例如 '18'
+
+            // 尋找對應的術後輸入框
+            const postOpInput = document.querySelector(`.post-op-pd[data-field='${dataField}']`);
+
+            if (postOpInput && !postOpInput.disabled) {
+                const postOpValue = parseInt(postOpInput.value.trim(), 10);
+                
+                // 檢查是否滿足「術後數值比術前少 2 以上」
+                if (!isNaN(postOpValue) && (preOpValue - postOpValue >= 2)) {
+                    // 該牙齒的任一欄位符合改善標準，將其牙齒編號加入 Set
+                    improvedTeeth.add(toothNumber);
+                }
+            }
+        }
+    });
+
+    const postOpImprovementCount = improvedTeeth.size;
+
+    // 2. 更新「治療後至少一個部位改善 2mm 齒數」顯示 (自動計算)
+    const improvementCountElement = document.getElementById('post-op-improvement-count');
+    if (improvementCountElement) {
+        // 使用 textContent 更新 Span 的顯示，並加上單位 ' 顆'
+        improvementCountElement.textContent = `${postOpImprovementCount} 顆`;
+    }
+    
+    // 3. 計算改善率
+    const preOpPathologyCountElement = document.getElementById('pathology-tooth-count');
+    // 從顯示的文字中提取術前病理牙顆數
+    const preOpPathologyCountText = preOpPathologyCountElement ? preOpPathologyCountElement.textContent.replace(' 顆', '') : '0';
+    const preOpPathologyCount = parseInt(preOpPathologyCountText, 10) || 0;
+
+    let improvementRate = 0.00;
+    let warningMessage = '';
+
+    if (preOpPathologyCount > 0) {
+        improvementRate = (postOpImprovementCount / preOpPathologyCount) * 100;
+    }
+
+    // 4. 更新「改善率」顯示
+    const improvementRateElement = document.getElementById('improvement-rate');
+    const warningElement = document.getElementById('improvement-rate-warning');
+
+    if (improvementRateElement) {
+        // 使用 textContent 更新 Span 的顯示，並加上單位 ' %'
+        improvementRateElement.textContent = `${improvementRate.toFixed(2)} %`; 
+        
+        // 5. 改善率警告提示
+        if (improvementRate < 70 && preOpPathologyCount > 0) {
+            warningMessage = '⚠️ 改善率低於 70%，無法申報 91023C';
+        }
+        
+        // 更新警告元素
+        if (warningElement) {
+            warningElement.textContent = warningMessage;
+            if (warningMessage) {
+                warningElement.classList.remove('hidden');
+            } else {
+                warningElement.classList.add('hidden');
+            }
+        }
+    }
+}
+
+
+/**
+ * 統計術前 PD >= 5 的牙齒數量 (病理顆數)。
+ */
+function updatePathologyCount() {
+    const teethWithPathology = new Set();
+    const preOpPdInputs = document.querySelectorAll('.pre-op-pd');
+
+    preOpPdInputs.forEach(input => {
+        if (input.disabled) return;
+
+        const value = parseInt(input.value.trim(), 10);
+
+        if (!isNaN(value) && value >= 5) {
+            const dataField = input.getAttribute('data-field');
+            if (dataField) {
+                const toothNumber = dataField.split('-')[0];
+                teethWithPathology.add(toothNumber);
+            }
+        }
+    });
+
+    const countElement = document.getElementById('pathology-tooth-count');
+    if (countElement) {
+        const totalCount = teethWithPathology.size;
+        countElement.textContent = `${totalCount} 顆`;
+    }
+    
+    // 病理顆數（術前顆數）改變，需要重新計算術後改善率
+    updatePostOpEvaluation();
+}
 
 /**
  * 更新現存總齒數 (32 - 缺牙數)。
  */
 function updateTotalTeethCount() {
-    const totalTeeth = INITIAL_TOTAL_TEETH; // 預設 32 顆牙
+    const totalTeeth = INITIAL_TOTAL_TEETH; 
     const missingToggles = document.querySelectorAll('.missing-tooth-toggle');
 
     let missingCount = 0;
@@ -1703,9 +1928,11 @@ function updateTotalTeethCount() {
 
     const countElement = document.getElementById('pre-op-total-teeth');
     if (countElement) {
-        // 更新顯示文字：顯示現存總齒數
         countElement.textContent = `${presentCount} 顆`;
     }
+    
+    // 總齒數改變可能會影響術後改善率的基礎，因此也需要更新術後評估
+    updatePostOpEvaluation(); 
 }
 
 /**
@@ -1725,48 +1952,19 @@ function handleMissingTooth(toggleElement) {
             input.value = '';
             input.disabled = true;
             input.classList.add('bg-gray-200', 'cursor-not-allowed');
-            input.classList.remove('value-ge-5', 'highlight-input');
+            // 移除可能的高亮 class
+            input.classList.remove('value-ge-5', 'highlight-input'); 
         } else {
             input.disabled = false;
             input.classList.remove('bg-gray-200', 'cursor-not-allowed');
-            // 重新應用高亮，確保復原後的狀態正確
+            // 重新應用高亮
             applyHighlight(input);
         }
     });
 
-    // 狀態改變後，重新計算病理顆數和總齒數
+    // 狀態改變後，重新計算病理顆數、總齒數和術後評估
     updatePathologyCount();
     updateTotalTeethCount();
-}
-
-/**
- * 統計術前 PD >= 5 的牙齒數量 (病理顆數)。
- */
-function updatePathologyCount() {
-    const teethWithPathology = new Set();
-    // 只檢查術前 (Pre-Op) PD 欄位
-    const preOpPdInputs = document.querySelectorAll('.pre-op-pd');
-
-    preOpPdInputs.forEach(input => {
-        if (input.disabled) return;
-
-        const value = parseInt(input.value.trim(), 10);
-
-        if (!isNaN(value) && value >= 5) {
-            const dataField = input.getAttribute('data-field');
-            if (dataField) {
-                // 從 data-field (例如: 18-M) 中提取牙齒編號 (18)
-                const toothNumber = dataField.split('-')[0];
-                teethWithPathology.add(toothNumber);
-            }
-        }
-    });
-
-    const countElement = document.getElementById('pathology-tooth-count');
-    if (countElement) {
-        const totalCount = teethWithPathology.size;
-        countElement.textContent = `${totalCount} 顆`;
-    }
 }
 
 // ===============================================
@@ -2189,7 +2387,7 @@ function importData(fileInput) {
 
 
 // ===============================================
-// 8. 初始化和事件監聽
+// 8. 初始化和事件監聽 (確保在 DOM 載入後執行)
 // ===============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2197,27 +2395,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 設定切換按鈕的初始化
     const toggleButton = document.getElementById('settings-toggle-btn');
     const settingsArea = document.getElementById('settings-area');
+    // 假設 toggleSettings 已經定義
     if (toggleButton && settingsArea) {
-        // 預設狀態: 開啟
-        settingsArea.classList.remove('hidden');
-        toggleButton.setAttribute('aria-expanded', 'true');
-        toggleButton.textContent = '設定 (點擊隱藏)';
+        // 預設狀態: 隱藏
+        settingsArea.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.textContent = '設定 (點擊開啟)';
         toggleButton.onclick = toggleSettings;
     }
 
     // 2. 呼叫 initializeFocusOrder 來建立初始 PD 欄位順序列表
+    // 假設 initializeFocusOrder 已經定義
     initializeFocusOrder();
 
     // 3. PD 輸入欄位事件綁定
     const allPdInputs = document.querySelectorAll('.pre-op-pd, .post-op-pd');
 
     allPdInputs.forEach(input => {
-        // 初始高亮 (針對已有的值)
+        // 初始高亮 (針對已有的值) - 假設 applyHighlight 已經定義
         applyHighlight(input);
 
-        // a. Input 事件: 數值檢查、高亮、病理計數 和 自動跳格
+        // a. Input 事件: 數值檢查、高亮、病理計數 和 自動跳格 (新增了計算函數的呼叫)
         input.addEventListener('input', (event) => {
+            // 確保紅字高亮 (假設 applyHighlight 已經定義)
             applyHighlight(event.target);
+            
+            // === 計算更新 ===
+            updatePathologyCount(); // 更新病理顆數 (會連帶觸發術後評估更新)
+            // ====================
 
             // --- 自動跳格邏輯 ---
             const value = event.target.value;
@@ -2230,6 +2435,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 條件 2: 輸入 '10' (兩位數)
                 const isTenJump = (value === '10');
 
+                // 假設 focusNextEnabledInput 已經定義
                 if (isSingleDigitJump || isTenJump) {
                     focusNextEnabledInput(event.target);
                 }
@@ -2243,6 +2449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // c. Keydown 事件: 處理方向鍵 (左右) 和 Enter 鍵的導航
+        // 假設 handleKeyNavigation 已經定義
         input.addEventListener('keydown', handleKeyNavigation);
     });
 
@@ -2253,15 +2460,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // 當缺牙狀態改變時，需要重新計算導航順序，因為某些欄位被啟用/禁用
             initializeFocusOrder();
         });
-        // 初始檢查缺牙狀態 (會觸發 handleMissingTooth 內的總齒數計算)
+        // 初始檢查缺牙狀態 (會觸發 handleMissingTooth 內的總齒數計算和術後評估)
         handleMissingTooth(toggle);
     });
 
-    // 5. 初始計算病理顆數 和 總齒數
-    updatePathologyCount();
+    // 5. 初始計算病理顆數, 總齒數 和 術後評估
+    // 確保所有值在載入時就被計算
     updateTotalTeethCount();
+    updatePathologyCount(); // 呼叫 Pathology 會再次呼叫 Evaluation
 
     // 6. 綁定功能按鈕事件
+    // 假設 copyPreOpToPostOp, clearAllInputs, exportData, importData 已經定義
     document.getElementById('copyDataBtn')?.addEventListener('click', copyPreOpToPostOp);
     document.getElementById('clearDataBtn')?.addEventListener('click', clearAllInputs);
 
