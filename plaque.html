@@ -8,6 +8,7 @@
           href="https://ymdd-image-tw.s3.ap-east-2.amazonaws.com/image/tooth-svgrepo-com.svg" 
           type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* 基礎表格樣式 */
         table, th, td { 
@@ -36,7 +37,6 @@
         .input-cell-container {
             padding: 0; 
             height: 30px; /* 給予一個固定的高度，確保行高一致 */
-            line-height: 30px;
         }
         
         /* ============== 表格佈局關鍵樣式 (確保上下對齊) ============== */
@@ -77,16 +77,26 @@
         
         /* ============== 輸入框樣式 ============== */
         .input-cell { 
-            width: 100%; 
-            height: 100%; 
-            box-sizing: border-box; 
-            border: none; 
-            text-align: center; 
-            padding: 5px 2px; /* 垂直 5px，水平 2px */
-            background-color: transparent; 
-            transition: background-color 0.2s;
-            line-height: normal;
-        }
+			width: 100%; 
+			height: 100%; 
+			box-sizing: border-box; 
+			border: none; 
+			text-align: center; 
+			
+			/* 💡 垂直 padding 仍保留，但可能是造成截斷的主因 */
+			/* 建議將 padding 設小，或完全依賴 flex/grid 來置中 */
+			padding: 2px 2px; /* 將垂直 padding 從 5px 縮小至 2px */
+			
+			background-color: transparent; 
+			transition: background-color 0.2s;
+			
+			/* 💡 關鍵：將 line-height 設為與 font-size 接近的值，以確保文字垂直置中 */
+			/* 假設 font-size 是 14px (繼承自 table) */
+			line-height: 1.4; /* 標準行高，或直接設為 14px */
+			
+			/* 確保文字不會因為 line-height 被 TD 截斷 */
+			overflow: visible; 
+		}
 
         .input-cell:focus {
             outline: 2px solid #4CAF50; 
@@ -204,7 +214,8 @@
 <!-- ============================================= -->
 <!-- 1. 設定切換按鈕 -->
 <!-- ============================================= -->
-<div class="flex justify-center my-4">
+<div class="flex justify-center space-x-4 my-4"> 
+    
     <button
         id="settings-toggle-btn"
         type="button"
@@ -214,6 +225,14 @@
         class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
     >
         設定
+    </button>
+    
+    <button
+        id="screenshotButton"
+        type="button"
+        class="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+    >
+        全頁截圖
     </button>
 </div>
 
@@ -1702,6 +1721,98 @@ function toggleSettings() {
 
 
 // ===============================================
+// 7.5 全頁截圖功能
+// ===============================================
+
+document.getElementById('screenshotButton').addEventListener('click', function() {
+    
+    const targetElement = document.body; 
+    const screenshotButton = this;
+    const VERTICAL_OFFSET = -2; 
+    
+    // 1. 隱藏按鈕
+    const settingsToggleBtn = document.getElementById('settings-toggle-btn');
+    settingsToggleBtn.style.visibility = 'hidden';
+    screenshotButton.style.visibility = 'hidden'; 
+
+    // 2. 暫時將表單元素替換為 <span>
+    const formControls = targetElement.querySelectorAll('.input-cell, select, input[type="text"]');
+    const placeholders = [];
+
+    formControls.forEach(input => {
+        let displayValue = '';
+        
+        if (input.tagName === 'SELECT') {
+            const selectElement = input;
+            if (selectElement.selectedIndex >= 0) {
+                 displayValue = selectElement.options[selectElement.selectedIndex].text; 
+            }
+        } else if (input.tagName === 'INPUT') {
+            displayValue = input.value;
+        }
+
+        if (displayValue !== '') {
+            const span = document.createElement('span');
+            span.className = input.className + ' screenshot-temp-text'; 
+            span.textContent = displayValue;
+            span.style.cssText = input.style.cssText;
+            if (input.classList.contains('value-ge-5')) {
+                span.classList.add('value-ge-5');
+            }
+            input.parentNode.appendChild(span);
+            input.style.display = 'none';
+            placeholders.push({ input: input, span: span });
+        }
+    });
+
+    // 3. 延遲執行截圖
+    setTimeout(() => {
+        html2canvas(targetElement, {
+            scale: 2, 
+            useCORS: true, 
+            background: '#f9fafb',
+            y: VERTICAL_OFFSET, 
+            
+        }).then(function(canvas) {
+            
+            // 4. 恢復 <input>/<select>
+            placeholders.forEach(item => {
+                item.input.style.display = 'block'; 
+                item.span.remove(); 
+            });
+
+            // 5. 恢復按鈕顯示
+            settingsToggleBtn.style.visibility = 'visible';
+            screenshotButton.style.visibility = 'visible';
+
+            // 6. 💡 關鍵調整：生成可讀檔名
+            const now = new Date();
+            // 輔助函式：確保數字是兩位數 (例如 5 -> 05)
+            const pad = (n) => String(n).padStart(2, '0');
+            
+            const year = now.getFullYear();
+            // 月份是從 0 開始的，所以需要 +1
+            const month = pad(now.getMonth() + 1); 
+            const day = pad(now.getDate());
+            const hours = pad(now.getHours());
+            const minutes = pad(now.getMinutes());
+            
+            // 格式：webpage-report-YYYYMMDD-HHMM.jpg
+            const filename = `plaque-${year}${month}${day}-${hours}${minutes}.jpg`;
+            
+            // 下載邏輯 (JPG 格式)
+            var image = canvas.toDataURL("image/jpeg", 0.95); 
+            
+            var link = document.createElement('a');
+            link.download = filename; 
+            link.href = image;
+            link.click();
+            link.remove();
+        });
+    }, 50); 
+});
+
+// ===============================================
 // 8. 初始化和事件監聽
 // ===============================================
 
@@ -1776,10 +1887,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleButton = document.getElementById('settings-toggle-btn');
     const settingsArea = document.getElementById('settings-area');
     if (toggleButton && settingsArea) {
-        // 預設狀態: 開啟
-        settingsArea.classList.remove('hidden');
-        toggleButton.setAttribute('aria-expanded', 'true');
-        toggleButton.textContent = '設定 (點擊隱藏)';
+        // 預設狀態: 隱藏
+        settingsArea.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.textContent = '設定 (點擊開啟)';
         toggleButton.onclick = toggleSettings;
     }
 
