@@ -125,7 +125,6 @@
       text-align: center;
       line-height: 1;                    /* 防止 label 出現多餘空白行 */
       min-height: 40px;                  /* 確保高度一致 */
-      white-space: nowrap;               /* 避免自動換行 */
   }
 
   /* === 各顏色變化（你可以自由調整） === */
@@ -348,7 +347,7 @@
 <!-- ============================================= -->
 <!-- 1. 設定切換按鈕 -->
 <!-- ============================================= -->   
-<div class="flex justify-center space-x-4 my-4"> 
+<div class="flex flex-wrap justify-center space-x-4 my-4"> 
     
     <button
         id="settings-toggle-btn"
@@ -356,7 +355,8 @@
         onclick="toggleSettings()"
         aria-expanded="true"
         aria-controls="settings-area"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+        
+        class="btn-like bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
     >
         設定
     </button>
@@ -364,13 +364,13 @@
     <button
         id="screenshotButton"
         type="button"
-        class="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+        
+        class="btn-like bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
     >
         全頁截圖
     </button>
 </div>
 
-</body>
 
 
 <!-- ============================================= -->
@@ -379,7 +379,7 @@
 <!-- ============================================= -->
 <div id="settings-area">
 <!-- ✅ HTML 按鈕群組區塊 -->
-<div class="flex justify-center space-x-4">
+<div class="flex flex-wrap justify-center space-x-4">
   
   <!-- 1. 複製 PD 數據至術後 -->
   <button id="copyButton" onclick="copyPreOpToPostOp()" class="btn-like btn-green">
