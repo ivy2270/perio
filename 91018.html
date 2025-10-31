@@ -378,7 +378,10 @@
 <!-- ============================================= -->
 <div id="settings-area" class="hidden"> 
 <div class="flex justify-center space-x-4">
-   
+    <!-- 1. 複製 PD 數據至術後 -->
+  <button id="copyButton" onclick="copyPreOpToPostOp()" class="btn-like btn-green">
+      複製 PD 數據至術後
+  </button>
         
         <button onclick="exportData()" class="btn-like btn-blue">
             匯出數據 (JSON)
@@ -3454,3 +3457,4 @@ enableDrag();
 
 </body>
 </html>
+
