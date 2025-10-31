@@ -125,7 +125,6 @@
       text-align: center;
       line-height: 1;                    /* 防止 label 出現多餘空白行 */
       min-height: 40px;                  /* 確保高度一致 */
-      white-space: nowrap;               /* 避免自動換行 */
   }
 
   /* === 各顏色變化（你可以自由調整） === */
@@ -348,7 +347,7 @@
 <!-- ============================================= -->
 <!-- 1. 設定切換按鈕 -->
 <!-- ============================================= -->
-<div class="flex justify-center space-x-4 my-4"> 
+<div class="flex flex-wrap justify-center space-x-4 my-4"> 
     
     <button
         id="settings-toggle-btn"
@@ -356,7 +355,8 @@
         onclick="toggleSettings()"
         aria-expanded="true"
         aria-controls="settings-area"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+        
+        class="btn-like bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
     >
         設定
     </button>
@@ -364,7 +364,8 @@
     <button
         id="screenshotButton"
         type="button"
-        class="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
+        
+        class="btn-like bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap"
     >
         全頁截圖
     </button>
@@ -376,7 +377,7 @@
 <!-- 注意：初始狀態下，這裡不帶 hidden 類別，因為 JS 已經設定為開啟 -->
 <!-- ============================================= -->
 <div id="settings-area" class="hidden"> 
-<div class="flex justify-center space-x-4">
+<div class="flex flex-wrap justify-center space-x-4">
   
         <button onclick="exportData()" class="btn-like btn-blue">
             匯出數據 (JSON)
@@ -2006,6 +2007,13 @@ function toggleKeypad() {
         keypad.classList.remove('keypad-hidden');
         toggleBtn.textContent = '關閉數字鍵盤';
         attachInputListeners();
+        
+        // 🚨 修正：確保 Keypad 第一次開啟時才執行拖曳功能初始化
+        if (!isDragEnabled) {
+            enableDrag();
+            isDragEnabled = true;
+        }
+
     } else {
         // 關閉時清除 activeInput 的樣式和變數
         if (activeInput) {
@@ -2152,6 +2160,7 @@ function handleKeypadInput(event) {
 // D. Keypad 拖曳邏輯
 // ===============================================
 
+// 全局變量用於拖曳邏輯
 let isDragging = false;
 let offsetX, offsetY;
 let keypadElement;
@@ -2162,54 +2171,73 @@ function enableDrag() {
     
     if (!keypadElement || !keypadHeader) return;
 
-    // 拖曳只綁定在 Header 上
+    // --- 1. 開始拖曳 ---
     keypadHeader.addEventListener('mousedown', startDrag);
+    // 支援觸控裝置
     keypadHeader.addEventListener('touchstart', startDrag, { passive: false }); 
 
+    // --- 2. 拖曳中 ---
     document.addEventListener('mousemove', dragMove);
     document.addEventListener('touchmove', dragMove, { passive: false });
 
+    // --- 3. 結束拖曳 ---
     document.addEventListener('mouseup', endDrag);
     document.addEventListener('touchend', endDrag);
 }
 
+
 function startDrag(e) {
+    // 阻止點擊事件影響 Keypad 內部元素，並避免拖曳圖片等默認行為
     e.preventDefault(); 
     
+    // 處理滑鼠和觸控事件的兼容性
     const clientX = e.clientX || e.touches[0].clientX;
     const clientY = e.clientY || e.touches[0].clientY;
 
     isDragging = true;
     
+    // 計算滑鼠/觸控點擊位置與 Keypad 左上角的偏移量
     const rect = keypadElement.getBoundingClientRect();
     offsetX = clientX - rect.left;
     offsetY = clientY - rect.top;
 
+    // 設置拖曳時的過渡為 none，避免延遲
     keypadElement.style.transition = 'none';
+
+    // 確保 Keypad 樣式是 fixed
     keypadElement.style.position = 'fixed';
 }
 
 function dragMove(e) {
     if (!isDragging) return;
 
+    // 阻止瀏覽器預設滾動，特別是觸控時
     e.preventDefault(); 
     
+    // 處理滑鼠和觸控事件的兼容性
     const clientX = e.clientX || e.touches[0].clientX;
-    const clientY = e.touches[0].clientY;
+    const clientY = e.clientY || e.touches[0].clientY;
 
+    // 計算 Keypad 的新位置
     let newX = clientX - offsetX;
     let newY = clientY - offsetY;
 
+    // 邊界限制（防止 Keypad 移出視窗）
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const keypadWidth = keypadElement.offsetWidth;
     const keypadHeight = keypadElement.offsetHeight;
 
+    // X 軸限制
     newX = Math.max(0, Math.min(newX, viewportWidth - keypadWidth));
+    // Y 軸限制
     newY = Math.max(0, Math.min(newY, viewportHeight - keypadHeight));
 
+
+    // 更新 CSS 樣式
     keypadElement.style.left = `${newX}px`;
     keypadElement.style.top = `${newY}px`;
+    // 清除 bottom 和 right 屬性
     keypadElement.style.right = 'auto'; 
     keypadElement.style.bottom = 'auto';
 }
@@ -2219,6 +2247,7 @@ function endDrag() {
     
     isDragging = false;
     
+    // 恢復過渡效果 (如果需要)
     keypadElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
 }
 
@@ -2228,6 +2257,17 @@ function endDrag() {
 
 document.addEventListener('DOMContentLoaded', () => {
     
+	    // 7. 綁定設定切換 (保留)
+    const toggleButton = document.getElementById('settings-toggle-btn');
+    const settingsArea = document.getElementById('settings-area');
+    if (toggleButton && settingsArea) {
+        // 預設狀態: 隱藏
+        settingsArea.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.textContent = '設定 (點擊開啟)';
+        toggleButton.onclick = toggleSettings;
+    }
+	
 	// 綁定鍵盤開關按鈕 (主介面按鈕)
 document.getElementById('keypadToggleBtn').addEventListener('click', toggleKeypad);
 
@@ -2238,7 +2278,8 @@ document.querySelectorAll('.keypad-btn').forEach(button => {
 });
 
 // 啟用 Keypad 拖曳功能
-enableDrag();
+    enableDrag();
+	
 	
     // 1. 初始化兩組 Plaque Score 模擬器
     // 數據組 1
@@ -2305,16 +2346,7 @@ enableDrag();
     document.getElementById('clearDataBtn')?.addEventListener('click', clearAllInputs);
     // document.getElementById('copyDataBtn') 已被移除
 
-    // 7. 綁定設定切換 (保留)
-    const toggleButton = document.getElementById('settings-toggle-btn');
-    const settingsArea = document.getElementById('settings-area');
-    if (toggleButton && settingsArea) {
-        // 預設狀態: 隱藏
-        settingsArea.classList.add('hidden');
-        toggleButton.setAttribute('aria-expanded', 'false');
-        toggleButton.textContent = '設定 (點擊開啟)';
-        toggleButton.onclick = toggleSettings;
-    }
+
 
     // 8. 暴露給全域環境，以供 HTML 中直接呼叫
     window.initializeFocusOrder = initializeFocusOrder;
