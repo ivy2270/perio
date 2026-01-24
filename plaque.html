@@ -341,6 +341,35 @@
     background-color: #f3f4f6; 
     transition: box-shadow 0.1s ease;
 }
+
+/* 修改小鍵盤網格，增加一列 */
+.keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+/* 控制按鈕的基本色調，使其與數字鍵融合但有區隔 */
+.keypad-btn.control-key {
+    background-color: #f1f5f9; /* 淺灰色 */
+    color: #475569;
+    font-weight: 600;
+}
+
+/* 讓刪除鍵跨兩欄 */
+.col-span-2 {
+    grid-column: span 2 / span 2;
+}
+
+/* 方向鍵的顏色可以稍微再淡一點，讓它更融入 */
+[data-key="left"], [data-key="right"] {
+    background-color: #f8fafc; 
+}
+
+/* 懸停效果 */
+.keypad-btn:active {
+    background-color: #e2e8f0;
+}
     </style>
 </head>
 <body class="bg-gray-50 p-6 font-sans">
@@ -436,22 +465,22 @@
 
 <div id="floatingKeypad" class="keypad-hidden">
     
-    <div class="keypad-grid">
+<div class="keypad-grid">
         <button class="keypad-btn" data-key="7">7</button>
         <button class="keypad-btn" data-key="8">8</button>
         <button class="keypad-btn" data-key="9">9</button>
-        
         <button class="keypad-btn" data-key="4">4</button>
         <button class="keypad-btn" data-key="5">5</button>
         <button class="keypad-btn" data-key="6">6</button>
-        
         <button class="keypad-btn" data-key="1">1</button>
         <button class="keypad-btn" data-key="2">2</button>
         <button class="keypad-btn" data-key="3">3</button>
+<button class="keypad-btn control-key" data-key="left">←</button>
+<button class="keypad-btn" data-key="0">0</button>
+<button class="keypad-btn control-key" data-key="right">→</button>
 
-        <button class="keypad-btn control-key" data-key="C">清空</button>
-        <button class="keypad-btn" data-key="0">0</button>
-        <button class="keypad-btn control-key" data-key="del">刪除</button>
+<button class="keypad-btn control-key" data-key="C">清空</button>
+<button class="keypad-btn control-key col-span-2" data-key="del">刪除</button>
     </div>
 
     <div class="keypad-footer-controls">
@@ -2102,12 +2131,33 @@ function handleInputBlur() {
 // ===============================================
 
 function handleKeypadInput(event) {
-    const key = event.target.dataset.key;
+    // 取得點擊的按鈕（處理可能點到 span 或 icon 的情況）
+    const btn = event.target.closest('button');
+    if (!btn) return;
+    
+    const key = btn.dataset.key;
     const currentInput = activeInput; 
     
     event.preventDefault(); 
-    
     if (!currentInput || !key) return; 
+
+    // --- 處理方向鍵部分 ---
+// --- 在 handleKeypadInput 函數內修改 ---
+if (key === 'left' || key === 'right') {
+    const isLeft = key === 'left';
+    const fakeEvent = {
+        key: isLeft ? 'ArrowLeft' : 'ArrowRight',
+        keyCode: isLeft ? 37 : 39, // 補上 keyCode，這是您原本 handleKeyNavigation 判斷的依據
+        preventDefault: () => {},
+        target: currentInput
+    };
+    
+    if (typeof handleKeyNavigation === 'function') {
+        handleKeyNavigation(fakeEvent);
+    }
+    return; 
+}
+    // ----------------------
 
     let value = currentInput.value;
     let shouldBlurAfterInput = false;
@@ -2124,17 +2174,13 @@ function handleKeypadInput(event) {
         default: 
             if (key >= '0' && key <= '9') {
                 let newValue = key; 
-                
                 if (value.length === 1) {
                     if (value === '1' && key === '0') {
                         newValue = '10'; 
-                    } else if (value === '0' && key !== '0') {
-                        // 覆蓋 '0'
                     }
                 } else if (value.length >= 2) {
                      return;
                 }
-                
                 currentInput.value = newValue;
                 shouldBlurAfterInput = true;
             } else {
@@ -2146,8 +2192,9 @@ function handleKeypadInput(event) {
     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
     
     if (currentInput.value.length === 2) {
-        // 確保 focusNextEnabledInput 在其他地方已定義
-        focusNextEnabledInput(currentInput); 
+        if (typeof focusNextEnabledInput === 'function') {
+            focusNextEnabledInput(currentInput); 
+        }
     }
     
     if (shouldBlurAfterInput) {
