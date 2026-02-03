@@ -2130,12 +2130,12 @@ function handleMissingTooth(toggleElement) {
         if (isMissing) {
             input.value = '';
             input.disabled = true;
-            input.classList.add('bg-gray-200', 'cursor-not-allowed');
+            input.classList.add('bg-gray-400', 'cursor-not-allowed');
             // 移除可能的高亮 class
             input.classList.remove('value-ge-5', 'highlight-input'); 
         } else {
             input.disabled = false;
-            input.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            input.classList.remove('bg-gray-400', 'cursor-not-allowed');
             // 重新應用高亮
             applyHighlight(input);
         }
