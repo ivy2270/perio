@@ -1568,11 +1568,11 @@ function handleMissingTooth(toggleElement) {
         if (isMissing) {
             input.value = ''; // 清空值
             input.disabled = true;
-            input.classList.add('bg-gray-200', 'cursor-not-allowed');
+            input.classList.add('bg-gray-400', 'cursor-not-allowed');
             input.classList.remove('plaque-positive');
         } else {
             input.disabled = false;
-            input.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            input.classList.remove('bg-gray-400', 'cursor-not-allowed');
             // 重新檢查值，確保復原後的樣式正確 (儘管此時值應該是空的)
             applyOneOnlyValidation(input, 'plaqueScoreInput', '.pre-op-pd'); 
             applyOneOnlyValidation(input, 'plaqueScoreInput2', '.post-op-pd'); 
