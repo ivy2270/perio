@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>牙醫診所紀錄管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tag-pre    { background:#dbeafe; color:#1d4ed8; border:1px solid #bfdbfe; }
+        .tag-post   { background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
+        .tag-plaque { background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
+        .tag-91018  { background:#fef3c7; color:#b45309; border:1px solid #fde68a; }
+        .tag-other  { background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; }
+        
+        /* 平滑過渡 */
+        .mode-transition { transition: all 0.3s ease; }
+        .hidden-mode { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-4 md:p-12 font-sans">
+    <div class="max-w-3xl mx-auto">
+        <header class="mb-10 text-center relative">
+            <button onclick="toggleSettings()" class="absolute right-0 top-0 p-2 text-slate-400 hover:text-blue-600 transition-colors" title="系統設定">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+            <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">病案紀錄中心</h1>
+            <p id="mode-subtitle" class="text-slate-500 mt-3 text-lg">載入中...</p>
+        </header>
+
+        <div id="settings-panel" class="hidden mb-8 bg-white p-6 rounded-2xl shadow-lg border border-blue-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="bg-blue-100 text-blue-600 p-1 rounded">⚙️</span> 系統連線設定
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">GAS 部署網址 (URL)</label>
+                    <input type="text" id="setup-url" placeholder="https://script.google.com/macros/s/.../exec" 
+                           class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">存取密鑰 (Access Key)</label>
+                    <input type="password" id="setup-key" placeholder="請輸入診所專用 KEY" 
+                           class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="saveSettings()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all">儲存並連線</button>
+                    <button onclick="clearSettings()" class="px-4 bg-slate-100 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-xl transition-all">清空</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="search-section" class="hidden-mode mb-8">
+            <div class="bg-white rounded-2xl shadow-xl p-2 flex items-center border border-slate-200">
+                <input type="text" id="queryInput" placeholder="搜尋姓名或身分證..."
+                       class="flex-1 bg-transparent border-none px-6 py-4 text-lg focus:ring-0 outline-none"
+                       onkeypress="if(event.keyCode==13) searchPatient()">
+                <button onclick="searchPatient()" id="searchBtn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl transition-all duration-200 font-bold shadow-lg shadow-blue-200 active:scale-95">
+                    搜尋
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <a href="perio.html" target="_blank" class="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all text-center">
+                <div class="text-3xl mb-2">🦷</div>
+                <div class="font-bold text-slate-700 group-hover:text-emerald-600">牙周囊袋</div>
+                <div class="text-xs text-slate-400 mt-1">術前/術後深度紀錄</div>
+            </a>
+            <a href="91018.html" target="_blank" class="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-amber-300 transition-all text-center">
+                <div class="text-3xl mb-2">📋</div>
+                <div class="font-bold text-slate-700 group-hover:text-amber-600">91018 表單</div>
+                <div class="text-xs text-slate-400 mt-1">健保專用評估紀錄</div>
+            </a>
+            <a href="plaque.html" target="_blank" class="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-teal-300 transition-all text-center">
+                <div class="text-3xl mb-2">✨</div>
+                <div class="font-bold text-slate-700 group-hover:text-teal-600">牙菌斑指數</div>
+                <div class="text-xs text-slate-400 mt-1">Plaque Score 計算</div>
+            </a>
+        </div>
+
+        <div id="patientList" class="space-y-4 mb-4"></div>
+
+        <div id="recordPanel" class="hidden">
+            <div class="flex items-center justify-between mb-3">
+                <h2 id="recordPanelTitle" class="text-xl font-bold text-slate-700"></h2>
+                <button onclick="closeRecordPanel()" class="text-slate-400 hover:text-slate-600 text-sm underline">← 返回搜尋結果</button>
+            </div>
+            <div id="recordList" class="space-y-3"></div>
+        </div>
+
+        <div id="statusMsg" class="hidden text-center py-20 text-slate-400 text-lg">
+            查無相關紀錄，請重新輸入。
+        </div>
+
+        <div id="visitor-hint" class="hidden-mode text-center p-10 border-2 border-dashed border-slate-200 rounded-3xl">
+            <p class="text-slate-400">目前為 <span class="font-bold text-slate-600">離線訪客模式</span></p>
+            <p class="text-sm text-slate-400 mt-2">您可以自由使用上方表單進行計算與截圖。<br>若需儲存至雲端，請點擊右上角 ⚙️ 設定連線。</p>
+        </div>
+    </div>
+
+    <script>
+        // ── 核心配置管理 ──────────────────────────────────────────
+        const CONFIG = {
+            get url() { return localStorage.getItem('CLINIC_GAS_URL'); },
+            get key() { return localStorage.getItem('CLINIC_ACCESS_KEY'); },
+            get isClinicMode() { return !!(this.url && this.key); }
+        };
+
+        // 初始化頁面狀態
+        window.onload = function() {
+            updateUiMode();
+        };
+
+        function updateUiMode() {
+            const subtitle = document.getElementById('mode-subtitle');
+            const searchSection = document.getElementById('search-section');
+            const visitorHint = document.getElementById('visitor-hint');
+
+            if (CONFIG.isClinicMode) {
+                subtitle.innerHTML = `輸入 <span class="font-semibold text-blue-600">患者姓名</span> 或 <span class="font-semibold text-blue-600">身分證字號</span> 查詢`;
+                searchSection.classList.remove('hidden-mode');
+                visitorHint.classList.add('hidden-mode');
+                // 預填設定欄位
+                document.getElementById('setup-url').value = CONFIG.url;
+                document.getElementById('setup-key').value = CONFIG.key;
+            } else {
+                subtitle.innerHTML = `<span class="bg-slate-200 text-slate-600 px-3 py-1 rounded-full text-sm font-bold">訪客模式</span>`;
+                searchSection.classList.add('hidden-mode');
+                visitorHint.classList.remove('hidden-mode');
+            }
+        }
+
+        // ── 設定功能 ──────────────────────────────────────────────
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('setup-url').value.trim();
+            const key = document.getElementById('setup-key').value.trim();
+            
+            if (!url || !key) {
+                alert('請完整填寫 GAS URL 與 KEY');
+                return;
+            }
+
+            localStorage.setItem('CLINIC_GAS_URL', url);
+            localStorage.setItem('CLINIC_ACCESS_KEY', key);
+            alert('設定已儲存！');
+            location.reload();
+        }
+
+        function clearSettings() {
+            if (confirm('確定要清空所有設定並回到訪客模式嗎？')) {
+                localStorage.removeItem('CLINIC_GAS_URL');
+                localStorage.removeItem('CLINIC_ACCESS_KEY');
+                location.reload();
+            }
+        }
+
+        // ── 搜尋與渲染邏輯 (這部分延用原本的，但 API_URL 改讀 CONFIG) ──────────
+        async function searchPatient() {
+            if (!CONFIG.isClinicMode) return;
+
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById('searchBtn');
+            const patList = document.getElementById('patientList');
+            const recPanel = document.getElementById('recordPanel');
+            const statusMsg = document.getElementById('statusMsg');
+
+            btn.disabled = true;
+            btn.innerHTML = `搜尋中...`;
+            patList.innerHTML = '';
+            recPanel.classList.add('hidden');
+            statusMsg.classList.add('hidden');
+
+            try {
+                // 使用 CONFIG.url 和 CONFIG.key
+                const resp = await fetch(`${CONFIG.url}?key=${CONFIG.key}&action=search&query=${encodeURIComponent(query)}`);
+                const data = await resp.json();
+
+                if (data.length === 0) {
+                    statusMsg.classList.remove('hidden');
+                } else {
+                    const patientMap = {};
+                    data.forEach(record => {
+                        if (!patientMap[record.pid]) {
+                            patientMap[record.pid] = { name: record.name, pid: record.pid, records: [] };
+                        }
+                        patientMap[record.pid].records.push(record);
+                    });
+                    renderPatientList(Object.values(patientMap));
+                }
+            } catch (e) {
+                alert('連線失敗，請檢查設定與網路。');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '搜尋';
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function renderPatientList(patients) {
+            const container = document.getElementById('patientList');
+            patients.forEach(patient => {
+                const card = document.createElement('div');
+                card.className = "group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex justify-between items-center";
+                card.onclick = () => loadPatientRecords(patient.pid, patient.name);
+
+                const latestDate = patient.records.map(r => formatDate(r.date)).sort().reverse()[0];
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${patient.name}</span>
+                            <span class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500">${patient.pid}</span>
+                        </div>
+                        <span class="text-sm text-slate-400">共 ${patient.records.length} 筆紀錄 ‧ 最近：${latestDate}</span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-slate-300 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function loadPatientRecords(pid, name) {
+            document.getElementById('patientList').innerHTML = '';
+            document.getElementById('statusMsg').classList.add('hidden');
+
+            const panel = document.getElementById('recordPanel');
+            const title = document.getElementById('recordPanelTitle');
+            const list = document.getElementById('recordList');
+
+            title.textContent = `${name}（${pid}）的所有紀錄`;
+            list.innerHTML = '<p class="text-slate-400 text-center py-8">載入中…</p>';
+            panel.classList.remove('hidden');
+
+            try {
+                const resp = await fetch(`${CONFIG.url}?key=${CONFIG.key}&action=getByPid&pid=${encodeURIComponent(pid)}`);
+                const records = await resp.json();
+                renderRecordList(records, pid, name);
+            } catch (e) {
+                list.innerHTML = '<p class="text-red-400 text-center py-8">載入失敗</p>';
+            }
+        }
+
+        function renderRecordList(records, pid, name) {
+            const list = document.getElementById('recordList');
+            list.innerHTML = '';
+
+            records.forEach(record => {
+                const tagClass = getTagClass(record.type);
+                const targetUrl = getTargetUrl(record.type);
+
+                const card = document.createElement('div');
+                card.className = "group bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex justify-between items-center";
+                card.onclick = () => {
+            // 點擊歷史紀錄：開啟新視窗查看詳細內容
+            const finalUrl = `${targetUrl}?rowId=${record.rowId}`;
+            window.open(finalUrl, '_blank');
+        };
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${tagClass}">${record.type}</span>
+                        <span class="text-base font-semibold text-slate-700">${formatDate(record.date)}</span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-300 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function getTagClass(type) {
+            if (!type) return 'tag-other';
+            if (type.includes('術前')) return 'tag-pre';
+            if (type.includes('術後')) return 'tag-post';
+            if (type.includes('牙菌斑')) return 'tag-plaque';
+            if (type.includes('91018')) return 'tag-91018';
+            return 'tag-other';
+        }
+
+        function getTargetUrl(type) {
+            if (!type) return 'perio.html';
+            if (type.includes('牙菌斑')) return 'plaque.html';
+            if (type.includes('91018')) return '91018.html';
+            return 'perio.html';
+        }
+
+        function closeRecordPanel() {
+            document.getElementById('recordPanel').classList.add('hidden');
+            document.getElementById('patientList').innerHTML = '';
+            searchPatient();
+        }
+    </script>
+</body>
+</html>
