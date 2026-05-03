@@ -32,13 +32,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </button>
-            <h1 id="site-title" class="text-4xl font-extrabold text-slate-800 tracking-tight">牙統資料紀錄中心</h1>
+            <h1 id="site-title" class="text-4xl font-extrabold text-slate-800 tracking-tight">牙統資料中心</h1>
             <p id="mode-subtitle" class="text-slate-500 mt-3 text-lg">載入中...</p>
         </header>
 
         <div id="settings-panel" class="hidden mb-8 bg-white p-6 rounded-2xl shadow-lg border border-blue-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">⚙️ 系統連線設定</h3>
             <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1">診所名稱</label>
+                    <input type="text" id="setup-name" placeholder="例：大安" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-600 mb-1">GAS 部署網址 (URL)</label>
                     <input type="text" id="setup-url" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
@@ -174,6 +178,15 @@
             }
         }
 
+        // 只保留日期部分（去掉 T16:00:00.000Z 之類的時間），並統一格式
+        function formatDate(raw) {
+            if (!raw) return '';
+            // ISO 字串：取 T 前面的日期部分
+            const s = String(raw).trim().split('T')[0];
+            // 已是 YYYY-MM-DD 或 YYYY/MM/DD，直接回傳（統一為斜線格式）
+            return s.replace(/-/g, '/');
+        }
+
         function renderPatientList(patients) {
             // 依最近紀錄日期降冪排序（最新的排最上面）
             patients.sort((a, b) => {
@@ -192,7 +205,7 @@
                             <span class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${p.name}</span>
                             <span class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500">${p.pid}</span>
                         </div>
-                        <span class="text-sm text-slate-400">最近紀錄：${p.date} (${p.type})</span>
+                        <span class="text-sm text-slate-400">最近紀錄：${formatDate(p.date)} (${p.type})</span>
                     </div>
                     <span class="text-slate-300 group-hover:text-blue-500">→</span>
                 `;
@@ -220,7 +233,7 @@
                         let url = `${getTargetUrl(r.type)}?rowId=${r.rowId}&setup_url=${encodeURIComponent(CONFIG.url)}&setup_key=${encodeURIComponent(CONFIG.key)}`;
                         window.open(url, '_blank');
                     };
-                    card.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${getTagClass(r.type)}">${r.type}</span><span class="font-semibold text-slate-700">${r.date}</span>`;
+                    card.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${getTagClass(r.type)}">${r.type}</span><span class="font-semibold text-slate-700">${formatDate(r.date)}</span>`;
                     list.appendChild(card);
                 });
             } catch (e) { list.innerHTML = '載入失敗'; }
@@ -246,8 +259,19 @@
             window.open(url, '_blank');
         }
 
-        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('hidden'); }
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                document.getElementById('setup-name').value = CONFIG.clinicName || '';
+                document.getElementById('setup-url').value  = CONFIG.url  || '';
+                document.getElementById('setup-key').value  = CONFIG.key  || '';
+            }
+        }
         function saveSettings() {
+            const name = document.getElementById('setup-name').value.trim();
+            if (name) localStorage.setItem('CLINIC_NAME', name);
+            else localStorage.removeItem('CLINIC_NAME');
             localStorage.setItem('CLINIC_GAS_URL', document.getElementById('setup-url').value.trim());
             localStorage.setItem('CLINIC_ACCESS_KEY', document.getElementById('setup-key').value.trim());
             location.reload();
