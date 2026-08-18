@@ -1910,6 +1910,8 @@ function initializeFocusOrder() {
 function focusNextEnabledInput(currentInput) {
     // 假設 pdInputsOrder 是全局或可訪問的陣列
     if (pdInputsOrder.length === 0) return;
+    const currentRow = currentInput?.closest('tr');
+    if (!currentRow) return;
 
     const currentIndex = pdInputsOrder.indexOf(currentInput);
     if (currentIndex === -1) {
@@ -1921,6 +1923,7 @@ function focusNextEnabledInput(currentInput) {
     // 從當前位置開始往後尋找第一個未被禁用的輸入框
     for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
         const nextInput = pdInputsOrder[i];
+        if (nextInput.closest('tr') !== currentRow) return;
         if (!nextInput.disabled) {
             
             // 🚨 關鍵修正：在跳轉前，移除舊輸入框上的視覺高亮樣式
@@ -1956,7 +1959,6 @@ function handleKeyNavigation(event) {
 
     switch (event.keyCode) {
         case 39: // Right Arrow (右箭頭)
-        case 13: // Enter (自動跳轉到下一個) - 處理 Enter 跳轉
             event.preventDefault(); // 阻止預設的行為
             // 尋找下一個 enabled 輸入框
             for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
@@ -2752,12 +2754,6 @@ function handleKeypadInput(event) {
 
     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
     
-    // 檢查長度是否達到 2 (即 '10')，並直接呼叫導航函式
-    if (currentInput.value.length === 2) {
-        // 確保您在外部腳本中定義了 focusNextEnabledInput
-        focusNextEnabledInput(currentInput); 
-    }
-    
     // 再次強制 blur，確保系統鍵盤保持隱藏狀態 (游標會消失)
     if (shouldBlurAfterInput) {
         currentInput.blur();
@@ -2896,6 +2892,21 @@ function getUrlParam(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
+function getTodayDateString() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+function getLatestRecordDate(data) {
+    const dates = [
+        data.patientInfo?.['術前日期PreOpDate'],
+        data.patientInfo?.['術後日期PostOpDate']
+    ].map(value => String(value || '').trim()).filter(Boolean);
+
+    return dates.length ? dates.sort().pop() : getTodayDateString();
+}
+
 // 決定 Type 標籤
 function detectRecordType() {
     const preDate  = document.getElementById('pre-op-date')?.value;
@@ -2922,7 +2933,7 @@ async function saveToDatabase() {
     }
 
     const type = detectRecordType();
-    const date = data.patientInfo['術前日期PreOpDate'] || data.patientInfo['術後日期PostOpDate'] || new Date().toISOString().split('T')[0];
+    const date = getLatestRecordDate(data);
 
     const btn = document.getElementById('saveDbBtn');
     btn.disabled = true;
@@ -3105,23 +3116,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePathologyCount(); // 更新病理顆數 (會連帶觸發術後評估更新)
             // ====================
 
-            // --- 自動跳格邏輯 ---
             const value = event.target.value;
             const numericValue = parseInt(value, 10);
+            const isSingleDigitJump = (value.length === 1 && numericValue >= 2 && numericValue <= 9);
+            const isTenJump = (value === '10');
 
-            if (!isNaN(numericValue)) {
-                // 條件 1: 輸入 2-9 的單個數字
-                const isSingleDigitJump = (value.length === 1 && numericValue >= 2 && numericValue <= 9);
-
-                // 條件 2: 輸入 '10' (兩位數)
-                const isTenJump = (value === '10');
-
-                // 假設 focusNextEnabledInput 已經定義
-                if (isSingleDigitJump || isTenJump) {
-                    focusNextEnabledInput(event.target);
-                }
+            if (isSingleDigitJump || isTenJump) {
+                focusNextEnabledInput(event.target);
             }
-            // ---------------------
         });
 
         // b. Blur 事件: 再次應用高亮確保離開時數值正確

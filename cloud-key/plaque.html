@@ -1410,6 +1410,8 @@ function applyOneOnlyValidation(inputElement, plaqueInputID, inputClass) {
 function focusNextEnabledInput(currentInput) {
     // 假設 pdInputsOrder 是全局或可訪問的陣列
     if (typeof pdInputsOrder === 'undefined' || pdInputsOrder.length === 0) return;
+    const currentRow = currentInput?.closest('tr');
+    if (!currentRow) return;
 
     const currentIndex = pdInputsOrder.indexOf(currentInput);
     if (currentIndex === -1) {
@@ -1419,6 +1421,7 @@ function focusNextEnabledInput(currentInput) {
 
     for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
         const nextInput = pdInputsOrder[i];
+        if (nextInput.closest('tr') !== currentRow) return;
         if (!nextInput.disabled) {
             
             // 🚨 關鍵修正：在跳轉前，移除舊輸入框上的視覺高亮樣式
@@ -1501,7 +1504,6 @@ function handleKeyNavigation(event) {
 
     switch (event.keyCode) {
         case 39: // Right Arrow (右箭頭)
-        case 13: // Enter (自動跳轉到下一個)
             event.preventDefault(); // 阻止預設的行為
             // 尋找下一個 enabled 輸入框
             for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
@@ -2198,12 +2200,6 @@ if (key === 'left' || key === 'right') {
 
     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
     
-    if (currentInput.value.length === 2) {
-        if (typeof focusNextEnabledInput === 'function') {
-            focusNextEnabledInput(currentInput); 
-        }
-    }
-    
     if (shouldBlurAfterInput) {
         currentInput.blur();
     }
@@ -2358,6 +2354,21 @@ function getUrlParam(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
+function getTodayDateString() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+function getLatestRecordDate(data) {
+    const dates = [
+        data.patientInfo?.['日期PreOpDate'],
+        data.patientInfo?.['日期PostOpDate']
+    ].map(value => String(value || '').trim()).filter(Boolean);
+
+    return dates.length ? dates.sort().pop() : getTodayDateString();
+}
+
 async function saveToDatabase() {
     if (!CONFIG.isClinicMode) {
         showBanner('未偵測到資料庫設定，無法儲存', 'error');
@@ -2374,7 +2385,7 @@ async function saveToDatabase() {
         return;
     }
 
-    const date = new Date().toISOString().split('T')[0];
+    const date = getLatestRecordDate(data);
     const btn = document.getElementById('saveDbBtn');
     btn.disabled = true;
     const originalText = btn.textContent;
@@ -2517,12 +2528,6 @@ document.querySelectorAll('.keypad-btn').forEach(button => {
             // 執行驗證 (會同時更新百分比)
             applyOneOnlyValidation(currentInput, plaqueInputID, inputClass); 
 
-            // --- 自動跳格邏輯 ---
-            // 只要最終值為 '1' 就自動跳格
-            if (currentInput.value === '1') {
-                focusNextEnabledInput(currentInput);
-            }
-            // ---------------------
         });
 
         // b. Blur 事件: 再次應用驗證確保離開時數值正確

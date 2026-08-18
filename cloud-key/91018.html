@@ -2507,9 +2507,6 @@ function handlePlaqueInput(inputElement) {
     if (value === '1') {
         inputElement.value = '1';
         inputElement.classList.add('plaque-1-highlight');
-        
-        focusNextEnabledInput(inputElement);
-        
     } else if (value !== '') {
         inputElement.value = '';
     }
@@ -2585,6 +2582,8 @@ function initializeFocusOrder() {
 function focusNextEnabledInput(currentInput) {
     // 假設 pdInputsOrder 是全局或可訪問的陣列
     if (typeof pdInputsOrder === 'undefined' || pdInputsOrder.length === 0) return;
+    const currentRow = currentInput?.closest('tr');
+    if (!currentRow) return;
 
     const currentIndex = pdInputsOrder.indexOf(currentInput);
     if (currentIndex === -1) {
@@ -2594,6 +2593,7 @@ function focusNextEnabledInput(currentInput) {
 
     for (let i = currentIndex + 1; i < pdInputsOrder.length; i++) {
         const nextInput = pdInputsOrder[i];
+        if (nextInput.closest('tr') !== currentRow) return;
         if (!nextInput.disabled) {
             
             // 🚨 關鍵修正：在跳轉前，移除舊輸入框上的視覺高亮樣式
@@ -2625,7 +2625,6 @@ function handleKeyNavigation(event) {
 
     switch (event.keyCode) {
         case 39: // Right Arrow
-        case 13: // Enter
             event.preventDefault();
             nextIndex = currentIndex + 1;
             break;
@@ -3308,11 +3307,6 @@ if (key === 'left' || key === 'right') {
 
     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
     
-    if (currentInput.value.length === 2) {
-        // 確保 focusNextEnabledInput 在其他地方已定義
-        focusNextEnabledInput(currentInput); 
-    }
-    
     if (shouldBlurAfterInput) {
         currentInput.blur();
     }
@@ -3472,6 +3466,23 @@ function getUrlParam(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
 
+function getTodayDateString() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+function getLatestRecordDate(data) {
+    const dates = [
+        data.patientInfo?.['術前日期PreOpDate'],
+        data.patientInfo?.['術後日期PostOpDate'],
+        data.patientInfo?.['PD日期PDDate'],
+        data.patientInfo?.['Plaque日期PlaqueDate']
+    ].map(value => String(value || '').trim()).filter(Boolean);
+
+    return dates.length ? dates.sort().pop() : getTodayDateString();
+}
+
 async function saveToDatabase() {
     if (!CONFIG.isClinicMode) {
         showBanner('未偵測到資料庫設定，無法儲存', 'error');
@@ -3487,7 +3498,7 @@ async function saveToDatabase() {
         return;
     }
 
-    const date = new Date().toISOString().split('T')[0];
+    const date = getLatestRecordDate(data);
     const btn = document.getElementById('saveDbBtn');
     btn.disabled = true;
     const originalText = btn.textContent;
@@ -3622,7 +3633,6 @@ enableDrag();
 
                 const value = target.value;
                 const numericValue = parseInt(value, 10);
-                
                 const isSingleDigitJump = (value.length === 1 && numericValue >= 2 && numericValue <= 9);
                 const isTenJump = (value === '10');
 

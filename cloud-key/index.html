@@ -59,9 +59,9 @@
         </div>
 
         <div id="search-section" class="hidden-mode mb-8">
-            <div class="bg-white rounded-2xl shadow-xl p-2 flex items-center border border-slate-200">
-                <input type="text" id="queryInput" placeholder="搜尋姓名或身分證..." class="flex-1 bg-transparent border-none px-6 py-4 text-lg outline-none" onkeypress="if(event.keyCode==13) searchPatient()">
-                <button onclick="searchPatient()" id="searchBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-200 active:scale-95 transition-all">搜尋</button>
+            <div class="bg-white rounded-2xl shadow-xl p-2 flex flex-col sm:flex-row sm:items-center gap-2 border border-slate-200">
+                <input type="text" id="queryInput" placeholder="搜尋姓名或身分證..." class="w-full min-w-0 sm:flex-1 bg-transparent border-none px-4 sm:px-6 py-4 text-base sm:text-lg outline-none" onkeypress="if(event.keyCode==13) searchPatient()">
+                <button onclick="searchPatient()" id="searchBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-200 active:scale-95 transition-all whitespace-nowrap">搜尋</button>
             </div>
         </div>
 
@@ -188,10 +188,10 @@
         }
 
         function renderPatientList(patients) {
-            // 依最近紀錄日期降冪排序（最新的排最上面）
+            // 依最後更新時間降冪排序；畫面仍顯示手動輸入的紀錄日期
             patients.sort((a, b) => {
-                const da = new Date(a.date.replace(/\//g, '-'));
-                const db = new Date(b.date.replace(/\//g, '-'));
+                const da = new Date(a.updatedAt || a.date).getTime() || 0;
+                const db = new Date(b.updatedAt || b.date).getTime() || 0;
                 return db - da;
             });
             const container = document.getElementById('patientList');
@@ -240,6 +240,7 @@
         }
 
         function getTagClass(t) {
+            t = String(t || '');
             if (t.includes('術前')) return 'tag-pre';
             if (t.includes('術後')) return 'tag-post';
             if (t.includes('牙菌斑')) return 'tag-plaque';
@@ -248,6 +249,7 @@
         }
 
         function getTargetUrl(t) {
+            t = String(t || '');
             if (t.includes('牙菌斑')) return 'plaque.html';
             if (t.includes('91018')) return '91018.html';
             return 'perio.html';
